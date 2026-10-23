@@ -32,11 +32,29 @@ class EnrichmentService
             return;
         }
 
-        $this->website->enrich($workspace, $targetType, $target);
-        $this->places->enrich($workspace, $targetType, $target);
+        // Providers are intentionally isolated. A transient failure should
+        // still be retried by the queue, but it must not prevent another
+        // provider from returning useful partial enrichment for this record.
+        $transientFailure = null;
+
+        try {
+            $this->website->enrich($workspace, $targetType, $target);
+        } catch (TransientEnrichmentException $exception) {
+            $transientFailure = $exception;
+        }
+
+        try {
+            $this->places->enrich($workspace, $targetType, $target);
+        } catch (TransientEnrichmentException $exception) {
+            $transientFailure ??= $exception;
+        }
 
         if ($target instanceof Company && $this->placesHit($workspace, $targetType, $targetId)) {
             app(ResearchBrief::class)->writeIfStale($target);
+        }
+
+        if ($transientFailure instanceof TransientEnrichmentException) {
+            throw $transientFailure;
         }
     }
 

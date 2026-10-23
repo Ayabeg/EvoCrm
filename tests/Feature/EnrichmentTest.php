@@ -172,6 +172,50 @@ it('records transient provider failures and rethrows them for queue backoff', fu
         ->value('error'))->toContain('HTTP 503');
 });
 
+it('keeps partial provider results when one enrichment provider is transiently unavailable', function () {
+    config(['services.google.places_key' => 'test-places-key']);
+    Http::preventStrayRequests();
+    Http::fake([
+        'https://clinic-atlas.dz' => Http::response('temporary outage', 503),
+        'https://clinic-atlas.dz/*' => Http::response('temporary outage', 503),
+        'https://places.googleapis.com/v1/places:searchText' => Http::response([
+            'places' => [[
+                'id' => 'ChIJ-partial',
+                'displayName' => ['text' => 'Clinique Atlas'],
+                'formattedAddress' => 'Hydra, Alger, Algeria',
+                'googleMapsUri' => 'https://maps.google.com/?cid=partial',
+            ]],
+        ], 200),
+    ]);
+
+    $user = User::factory()->create();
+    $company = Company::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'name' => 'Clinique Atlas',
+        'domain' => 'clinic-atlas.dz',
+        'wilaya' => 'Alger',
+    ]);
+
+    expect(fn () => app(EnrichmentService::class)->enrich(
+        $user->workspace,
+        EnrichmentRun::TARGET_COMPANY,
+        (int) $company->id,
+    ))->toThrow(TransientEnrichmentException::class);
+
+    expect(EnrichmentRun::query()
+        ->where('workspace_id', $user->workspace_id)
+        ->where('source', EnrichmentRun::SOURCE_WEBSITE)
+        ->where('status', EnrichmentRun::STATUS_FAILED)
+        ->exists())->toBeTrue()
+        ->and(EnrichmentRun::query()
+            ->where('workspace_id', $user->workspace_id)
+            ->where('source', EnrichmentRun::SOURCE_GOOGLE_PLACES)
+            ->where('field', 'place_id')
+            ->value('value'))->toBe('ChIJ-partial');
+
+    Http::assertSent(fn ($request): bool => $request->url() === 'https://places.googleapis.com/v1/places:searchText');
+});
+
 it('does not overwrite a human-set field silently', function () {
     config(['services.google.places_key' => null]);
     fakeEnrichmentHttp();

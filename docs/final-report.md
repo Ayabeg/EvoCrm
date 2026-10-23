@@ -8,6 +8,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 
 - Shared workspace-scoped CRM integration across companies, contacts, leads, activities, consent, suppression, enrichment provenance, outbound messages, and funnel events.
 - Dead Enrichment ingestion, incomplete-row retention, normalization, duplicate-safe re-imports, provider evidence, verification-state projection, CRM detection, explainable data-quality scoring, bounded queueing, retries, and retry actions.
+- Enrichment providers are isolated within a run: transient failures remain retryable, while successful partial results from other providers are preserved.
 - EvoCRM Outbound eligibility, suppression rechecks, explicit consent policy, template rendering, sanitized HTML, preview, campaign and sequence execution, quiet hours, mailbox caps, durable send claims, provider-event idempotency, reply classification, unsubscribe handling, and interested-reply tasks.
 - Broadcast campaigns can be edited while draft or scheduled, with workspace-scoped audience/template/mailbox relationships; started campaigns remain immutable.
 - Broadcast campaigns persist a configurable 20/day default cap; excess messages remain queued with a durable defer reason and resume on the next day, while mailbox caps remain independently enforced.
@@ -41,6 +42,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Fail-closed missing-verification regression: **51 tests / 320 assertions passed** across enrollment, campaign execution, ordinary dispatch, and the controlled mailbox test-send path; Pint passed.
 - Broadcast campaign editing regression: **8 tests / 108 assertions passed**; the broader outbound lifecycle set passed **64 tests / 383 assertions**; PHP formatting, TypeScript, targeted ESLint, production Vite build, and `git diff --check` passed.
 - Per-campaign daily-cap regression: **70 tests / 402 assertions passed** across campaign expansion, rollover, editing, and outbound lifecycle; Pint, targeted ESLint, TypeScript, `git diff --check`, and the production Vite build passed. The build retains only the repository's existing optional-font, chunk-size, and dynamic-import warnings.
+- Partial-provider enrichment regression: **14 tests / 113 assertions passed** for enrichment, including a transient website failure with a retained Google Places result; the broader acquisition slice passed **39 tests / 284 assertions** and Pint passed.
 - Security review `adf68552-9b4c-4de9-a9df-5c42735668c6` for the conservative verification-policy change from `3d578579` through `d1738420`: complete coverage of the changed eligibility configuration and zero reportable findings.
 - Current acquisition diff-scoped Codex Security review `df528cd2-71b4-4b34-a846-e54a368f0cad` for `286f2634` through `5d125577`: complete coverage of three changed security surfaces and zero reportable findings. The subsequent migration-only review is recorded below.
 - Migration follow-up security review `e1610fcd-062f-4485-b9c4-b4d08ee6ba00` for `5d125577` through `3d578579`: complete coverage of the migration preflight and zero reportable findings.

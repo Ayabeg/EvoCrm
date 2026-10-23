@@ -250,6 +250,17 @@ Run the final release audit after the remaining UI/source-contract checks are re
 
 - Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
 
+## 2026-10-23 — partial-provider enrichment recovery
+
+### Completed / verified
+
+- Isolated website and Google Places enrichment providers inside one record run. A transient failure is recorded and rethrown for queue backoff after the other provider has completed, preserving useful partial results instead of aborting the run early.
+- Added a regression for a transient website outage with a successful Google Places result. The focused enrichment set passes **14 tests / 113 assertions**; the broader acquisition slice passes **39 tests / 284 assertions**; Pint passes.
+
+### Remaining
+
+- Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
+
 ## 2026-10-23 — per-campaign outbound daily cap
 
 ### Completed / verified
