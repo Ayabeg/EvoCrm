@@ -44,7 +44,7 @@ The current `enrichment_runs` table is a candidate/evidence ledger, but the broa
 - confidence/evidence strength;
 - decision (`accepted`, `rejected`, `needs_review`) and reason.
 
-For email fields, the latest run also projects status, source, evidence URL, retrieval time, confidence, and run ID onto `contacts.meta.email_verification` so outbound eligibility consumes the same provenance without a competing verification table.
+For email fields, the current-address projection also stores the exact email, status, source, evidence URL, retrieval time, confidence, and run ID on `contacts.meta.email_verification` so outbound eligibility consumes the same provenance without a competing verification table. Proposals for another address stay in `enrichment_runs` history and do not replace the current address's projection; stronger current-address evidence is retained when later evidence is weaker or inconclusive.
 
 Outbound email sequences and broadcast campaigns persist an `email_verification_policy` (`strict`, `allow_catch_all`, `allow_unknown`, or `allow_uncertain`). `strict` is the database default. A permissive target policy is not sufficient by itself: the deployment must also explicitly disable the matching global block. Only `verified` is unconditional deliverability proof; evidence-only, not-found, not-detected, conflicting, missing, invalid, temporary-failure, and unsupported results remain blocked. An explicit authenticated mailbox test send is operational plumbing, not campaign eligibility.
 

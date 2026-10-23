@@ -187,16 +187,63 @@ class EnrichmentPersister
             return;
         }
 
+        $candidateEmail = strtolower(trim((string) $run->value));
+        $currentEmail = strtolower(trim((string) $contact->email));
+
+        if ($candidateEmail === '') {
+            return;
+        }
+
+        // Keep proposals for other addresses in the run history, but do not
+        // let them change the verification state for the current address.
+        if ($currentEmail !== '' && $candidateEmail !== $currentEmail) {
+            return;
+        }
+
         $meta = $this->bag($contact->getAttribute('meta'));
+        $existing = $meta['email_verification'] ?? null;
+
+        if (is_array($existing)
+            && ($existing['email'] ?? null) === $candidateEmail
+            && $this->shouldPreserveEmailVerification($existing, $run->verification_status)) {
+            return;
+        }
+
         $meta['email_verification'] = [
             'status' => $run->verification_status,
             'source' => $run->source,
             'evidence_url' => $run->evidence_url,
+            'email' => $candidateEmail,
             'retrieved_at' => $run->retrieved_at?->toIso8601String(),
             'confidence' => (float) $run->confidence,
             'run_id' => $run->id,
         ];
         $contact->forceFill(['meta' => $meta])->save();
+    }
+
+    /**
+     * Keep stronger existing evidence when a later proposal is weaker or
+     * inconclusive. The EnrichmentRun history still records the later result.
+     *
+     * @param  array<string, mixed>  $existing
+     */
+    private function shouldPreserveEmailVerification(array $existing, string $incomingStatus): bool
+    {
+        $existingStatus = is_string($existing['status'] ?? null) ? $existing['status'] : null;
+
+        if ($existingStatus === EnrichmentRun::VERIFICATION_VERIFIED
+            && $incomingStatus !== EnrichmentRun::VERIFICATION_VERIFIED) {
+            return true;
+        }
+
+        return $existingStatus === EnrichmentRun::VERIFICATION_EVIDENCE_SUPPORTED
+            && in_array($incomingStatus, [
+                EnrichmentRun::VERIFICATION_UNKNOWN,
+                EnrichmentRun::VERIFICATION_NOT_FOUND,
+                EnrichmentRun::VERIFICATION_NOT_DETECTED,
+                EnrichmentRun::VERIFICATION_TEMPORARY_FAILURE,
+                EnrichmentRun::VERIFICATION_UNSUPPORTED,
+            ], true);
     }
 
     public function currentValue(Company|Contact|Lead $target, string $field): ?string

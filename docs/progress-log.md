@@ -250,6 +250,18 @@ Run the final release audit after the remaining UI/source-contract checks are re
 
 - Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
 
+## 2026-10-23 — address-bound verification provenance
+
+### Completed / verified
+
+- Bound projected email-verification state to the exact current contact address. A stale proposal for another address remains traceable in enrichment history without changing outbound eligibility.
+- Preserved stronger `verified` or evidence-supported state when a later current-address proposal is weaker or inconclusive; mismatched legacy/current projections fail closed as unknown.
+- The focused enrichment and outbound-policy regression passes **19 tests / 127 assertions**; Pint and `git diff --check` pass.
+
+### Remaining
+
+- Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
+
 ## 2026-10-23 — partial-provider enrichment recovery
 
 ### Completed / verified

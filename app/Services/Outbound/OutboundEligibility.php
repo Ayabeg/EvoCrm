@@ -52,7 +52,14 @@ final class OutboundEligibility
                 return null;
             }
 
-            $verificationStatus = data_get($contact->meta, 'email_verification.status');
+            $verification = data_get($contact->meta, 'email_verification');
+            $verificationEmail = is_array($verification) ? strtolower(trim((string) ($verification['email'] ?? ''))) : '';
+            $verificationStatus = is_array($verification) ? $verification['status'] ?? null : null;
+
+            if ($verificationEmail !== '' && $verificationEmail !== strtolower($email)) {
+                $verificationStatus = 'unknown';
+            }
+
             $verificationStatus = is_string($verificationStatus) && trim($verificationStatus) !== ''
                 ? trim($verificationStatus)
                 : 'unknown';

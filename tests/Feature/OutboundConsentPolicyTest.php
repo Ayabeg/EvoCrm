@@ -89,3 +89,25 @@ it('applies the explicit campaign verification policy during preview', function 
             'ineligible_count' => 0,
         ]);
 });
+
+it('fails closed when verification provenance belongs to a different current email', function () {
+    config([
+        'evosales.outbound.block_unknown_verification' => true,
+        'evosales.outbound.require_marketing_consent' => false,
+    ]);
+
+    $user = User::factory()->create();
+    $contact = Contact::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'email' => 'current@clinic.dz',
+        'meta' => [
+            'email_verification' => [
+                'email' => 'old@clinic.dz',
+                'status' => 'verified',
+            ],
+        ],
+    ]);
+
+    expect(app(OutboundEligibility::class)->reason($user->workspace, $contact, 'email'))
+        ->toBe('Contact email verification is unknown.');
+});

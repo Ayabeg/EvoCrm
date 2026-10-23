@@ -271,6 +271,51 @@ it('records email verification provenance on the shared contact and avoids auto-
         ->toBe($run->id);
 });
 
+it('keeps email verification tied to the current address and preserves stronger evidence', function () {
+    $user = User::factory()->create();
+    $contact = Contact::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'email' => 'verified@clinic-atlas.dz',
+        'meta' => [
+            'email_verification' => [
+                'email' => 'verified@clinic-atlas.dz',
+                'status' => EnrichmentRun::VERIFICATION_VERIFIED,
+                'source' => 'email_provider',
+                'confidence' => 0.99,
+            ],
+        ],
+    ]);
+
+    app(EnrichmentPersister::class)->persistProposal(
+        $user->workspace,
+        EnrichmentRun::TARGET_CONTACT,
+        $contact,
+        EnrichmentRun::SOURCE_WEBSITE,
+        'email',
+        'stale@clinic-atlas.dz',
+        0.95,
+        ['url' => 'https://clinic-atlas.dz/contact'],
+        EnrichmentRun::VERIFICATION_INVALID,
+    );
+
+    app(EnrichmentPersister::class)->persistProposal(
+        $user->workspace,
+        EnrichmentRun::TARGET_CONTACT,
+        $contact,
+        EnrichmentRun::SOURCE_GOOGLE_PLACES,
+        'email',
+        'verified@clinic-atlas.dz',
+        0.4,
+        [],
+        EnrichmentRun::VERIFICATION_UNKNOWN,
+    );
+
+    expect(data_get($contact->fresh()->meta, 'email_verification.email'))
+        ->toBe('verified@clinic-atlas.dz')
+        ->and(data_get($contact->fresh()->meta, 'email_verification.status'))
+        ->toBe(EnrichmentRun::VERIFICATION_VERIFIED);
+});
+
 it('applies and dismisses proposed enrichment runs', function () {
     $user = User::factory()->create();
     $contact = Contact::factory()->create([
