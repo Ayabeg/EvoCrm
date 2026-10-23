@@ -4,6 +4,7 @@ namespace App\Services\Outbound;
 
 use App\Models\Mailbox;
 use App\Models\OutboundMessage;
+use App\Services\Crm\WorkflowExecutionRedactor;
 use App\Services\Outbound\Contracts\OutboundMailer;
 use Illuminate\Support\Facades\Mail;
 use Symfony\Component\Mailer\SentMessage;
@@ -71,7 +72,7 @@ class SmtpMailboxMailer implements OutboundMailer
             $message->forceFill([
                 'status' => 'failed',
                 'sending_at' => null,
-                'failure_reason' => $e->getMessage(),
+                'failure_reason' => app(WorkflowExecutionRedactor::class)->redactError($e->getMessage()),
             ])->save();
         }
 

@@ -94,10 +94,16 @@ it('marks the message failed when the transport throws', function () {
     $mailbox = Mailbox::factory()->create(['enabled' => true]);
     $message = makeSmtpMessage($mailbox);
 
-    $result = smtpMailerStub($mailbox, null, new TransportException('Connection to outbound.evotechly.com:587 timed out'))->send($message);
+    $result = smtpMailerStub(
+        $mailbox,
+        null,
+        new TransportException('Connection to outbound.evotechly.com:587 timed out for owner@clinic.dz using Authorization: Bearer secret-value'),
+    )->send($message);
 
     expect($result->status)->toBe('failed');
     expect($result->failure_reason)->toContain('timed out');
+    expect($result->failure_reason)->not->toContain('owner@clinic.dz');
+    expect($result->failure_reason)->not->toContain('Bearer secret-value');
     expect($result->sent_at)->toBeNull();
 });
 
