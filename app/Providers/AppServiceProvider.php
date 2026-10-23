@@ -33,6 +33,9 @@ use App\Services\Desk\FakeSmsClient;
 use App\Services\Desk\HttpSmsGatewayClient;
 use App\Services\Desk\SmsClient;
 use App\Services\Desk\TwilioSmsClient;
+use App\Services\Enrichment\DisabledEmailVerificationProvider;
+use App\Services\Enrichment\DnsEmailVerificationProvider;
+use App\Services\Enrichment\EmailVerificationProvider;
 use App\Services\Identity\WorkspaceProvisioner;
 use App\Services\Operations\AuditLogger;
 use App\Services\Operations\ScheduledTaskMonitor;
@@ -79,6 +82,11 @@ class AppServiceProvider extends ServiceProvider
                 : $app->make(HttpSmsGatewayClient::class);
         });
         $this->app->singleton(ProductAnalytics::class);
+        $this->app->singleton(EmailVerificationProvider::class, function ($app) {
+            return config('evosales.enrichment.email_verification_driver') === 'dns'
+                ? $app->make(DnsEmailVerificationProvider::class)
+                : $app->make(DisabledEmailVerificationProvider::class);
+        });
     }
 
     public function boot(): void

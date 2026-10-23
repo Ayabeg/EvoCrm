@@ -45,7 +45,9 @@ Import or existing CRM record
 
 ### Dead Enrichment
 
-Use provider adapters and the existing `EnrichmentService`, `WebsiteEnricher`, `GooglePlacesEnricher`, `EnrichmentPersister`, import batches, and enrichment runs where their current contracts fit. A provider may add a candidate value, evidence, verification status, confidence, and error; it may not erase stronger existing data. Enrichment jobs are idempotent and retry transient failures only.
+Use provider adapters and the existing `EnrichmentService`, `WebsiteEnricher`, `GooglePlacesEnricher`, `EmailVerificationEnricher`, `EnrichmentPersister`, import batches, and enrichment runs where their current contracts fit. A provider may add a candidate value, evidence, verification status, confidence, and error; it may not erase stronger existing data. Enrichment jobs are idempotent and retry transient failures only.
+
+Email verification now has an explicit `EmailVerificationProvider` contract, a disabled-by-default provider that records `unsupported` honestly, and an optional safe DNS adapter. The DNS adapter validates syntax and records MX evidence as `evidence_supported`; it never performs SMTP probing, sends test messages, or claims that a mailbox exists. Results are cached per workspace/target/address for the configured freshness window, and stale or provider-backed results remain visible in the existing enrichment ledger.
 
 Lead scoring keeps commercial qualification separate from data quality: the existing fit/intent/timing score remains the qualification authority, while `DataQualityScorer` computes an explainable completeness score from the shared company/contact/source fields and persists it with each score snapshot.
 

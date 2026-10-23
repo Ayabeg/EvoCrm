@@ -9,6 +9,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Shared workspace-scoped CRM integration across companies, contacts, leads, activities, consent, suppression, enrichment provenance, outbound messages, and funnel events.
 - Dead Enrichment ingestion, incomplete-row retention, normalization, duplicate-safe re-imports, provider evidence, verification-state projection, CRM detection, explainable data-quality scoring, bounded queueing, retries, and retry actions.
 - Enrichment providers are isolated within a run: transient failures remain retryable, while successful partial results from other providers are preserved.
+- Email verification now has a modular provider contract, disabled-by-default fail-closed fallback, optional DNS syntax/MX evidence, address-bound projection, and freshness caching. DNS evidence is explicitly not mailbox-level deliverability proof.
 - EvoCRM Outbound eligibility, suppression rechecks, explicit consent policy, template rendering, sanitized HTML, preview, campaign and sequence execution, quiet hours, mailbox caps, durable send claims, provider-event idempotency, reply classification, unsubscribe handling, and interested-reply tasks.
 - Broadcast campaigns can be edited while draft or scheduled, with workspace-scoped audience/template/mailbox relationships; started campaigns remain immutable.
 - Broadcast campaigns persist a configurable 20/day default cap; excess messages remain queued with a durable defer reason and resume on the next day, while mailbox caps remain independently enforced.
@@ -49,6 +50,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Workspace-timezone campaign-cap regression: **24 tests / 164 assertions passed** for the outbound department; the broader outbound gate passed **72 tests / 411 assertions** with Pint and `git diff --check`.
 - Multi-workspace cap-isolation regression: **25 tests / 171 assertions passed** for the outbound department; the focused campaign/outbound slice passed **57 tests / 357 assertions** with Pint and `git diff --check`.
 - Signed lead-magnet booking regression: **20 tests / 195 assertions passed** across public calculator, meeting, and inbound workflow paths; Pint, targeted ESLint, TypeScript, and `git diff --check` passed.
+- Email-verification provider/cache regression: **17 tests / 123 assertions passed**; the cross-system enrichment/outbound slice passed **68 tests / 394 assertions** with Pint. The disabled provider records an explanatory unsupported result, while an injected provider is cached per current address.
 - The production Vite build passes after the signed booking handoff; only the repository's existing optional-font, chunk-size, and ineffective dynamic-import warnings remain.
 - Partial-provider enrichment regression: **14 tests / 113 assertions passed** for enrichment, including a transient website failure with a retained Google Places result; the broader acquisition slice passed **39 tests / 284 assertions** and Pint passed.
 - Address-bound verification regression: **19 tests / 127 assertions passed** across enrichment and outbound policy, covering stale-address mismatch and preservation of stronger evidence; Pint and `git diff --check` passed.
@@ -81,10 +83,11 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - `0e3b0660` — applied workspace timezones to campaign daily-cap counting and rollover.
 - `3d7798b2` — isolated campaign daily-cap counts by workspace in shared runner passes.
 - `58e83570` — signed lead-magnet booking attribution through the public meeting form.
+- Working-tree increment — modular email-verification provider contract, disabled fallback, optional DNS evidence, and cache coverage; commit pending after final checks.
 
 ## Implemented but not fully verified
 
-- Live SMTP/IMAP, mail-stack, Google Places, email-verification, Evolution, and other provider behavior remains unverified without configured external accounts.
+- Live SMTP/IMAP, mail-stack, Google Places, provider-backed email-verification, Evolution, and other provider behavior remains unverified without configured external accounts. The local email-verification contract and disabled/DNS evidence paths are verified.
 - Full repository release verification remains non-green because of the 8 remaining branding/design-system/automation contract failures.
 - The funnel-event uniqueness migration performs a non-destructive preflight and stops with an actionable error if historical duplicate subject-scoped rows exist; no destructive reconciliation policy is assumed locally.
 - The repository-wide review remains partial by design; the committed hardening diff review covers the quote/import follow-up and the full code change in `46661ae7`.

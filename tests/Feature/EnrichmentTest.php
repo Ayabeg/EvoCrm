@@ -7,6 +7,7 @@ use App\Models\Contact;
 use App\Models\EnrichmentRun;
 use App\Models\Lead;
 use App\Models\User;
+use App\Services\Enrichment\EmailVerificationProvider;
 use App\Services\Enrichment\EnrichmentPersister;
 use App\Services\Enrichment\EnrichmentService;
 use App\Services\Enrichment\TransientEnrichmentException;
@@ -269,6 +270,71 @@ it('records email verification provenance on the shared contact and avoids auto-
         ->toBe(EnrichmentRun::VERIFICATION_INVALID)
         ->and(data_get($contact->fresh()->meta, 'email_verification.run_id'))
         ->toBe($run->id);
+});
+
+it('runs the configured email verifier and caches the current-address result', function () {
+    $provider = new class implements EmailVerificationProvider
+    {
+        public int $calls = 0;
+
+        public function name(): string
+        {
+            return 'fake-verifier';
+        }
+
+        public function verify(string $email): array
+        {
+            $this->calls++;
+
+            return [
+                'status' => EnrichmentRun::VERIFICATION_VERIFIED,
+                'confidence' => 0.99,
+                'raw' => ['provider_id' => 'fake-1'],
+            ];
+        }
+    };
+    app()->instance(EmailVerificationProvider::class, $provider);
+
+    $user = User::factory()->create();
+    $contact = Contact::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'email' => 'owner@clinic-atlas.dz',
+    ]);
+
+    app(EnrichmentService::class)->enrich($user->workspace, EnrichmentRun::TARGET_CONTACT, (int) $contact->id);
+    app(EnrichmentService::class)->enrich($user->workspace, EnrichmentRun::TARGET_CONTACT, (int) $contact->id);
+
+    $run = EnrichmentRun::query()
+        ->where('workspace_id', $user->workspace_id)
+        ->where('source', EnrichmentRun::SOURCE_EMAIL_VERIFICATION)
+        ->where('target_id', $contact->id)
+        ->sole();
+
+    expect($provider->calls)->toBe(1)
+        ->and($run->verification_status)->toBe(EnrichmentRun::VERIFICATION_VERIFIED)
+        ->and(data_get($run->raw, 'provider_id'))->toBe('fake-1')
+        ->and(data_get($contact->fresh()->meta, 'email_verification.email'))->toBe('owner@clinic-atlas.dz')
+        ->and(data_get($contact->fresh()->meta, 'email_verification.status'))->toBe(EnrichmentRun::VERIFICATION_VERIFIED);
+});
+
+it('records disabled email verification as unsupported and keeps outbound eligibility fail-closed', function () {
+    $user = User::factory()->create();
+    $contact = Contact::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'email' => 'owner@clinic-atlas.dz',
+    ]);
+
+    app(EnrichmentService::class)->enrich($user->workspace, EnrichmentRun::TARGET_CONTACT, (int) $contact->id);
+
+    $run = EnrichmentRun::query()
+        ->where('workspace_id', $user->workspace_id)
+        ->where('source', EnrichmentRun::SOURCE_EMAIL_VERIFICATION)
+        ->where('target_id', $contact->id)
+        ->sole();
+
+    expect($run->verification_status)->toBe(EnrichmentRun::VERIFICATION_UNSUPPORTED)
+        ->and($run->error)->toContain('No email verification provider')
+        ->and(data_get($contact->fresh()->meta, 'email_verification.status'))->toBe(EnrichmentRun::VERIFICATION_UNSUPPORTED);
 });
 
 it('keeps email verification tied to the current address and preserves stronger evidence', function () {

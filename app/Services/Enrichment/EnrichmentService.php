@@ -16,6 +16,7 @@ class EnrichmentService
     public function __construct(
         private WebsiteEnricher $website,
         private GooglePlacesEnricher $places,
+        private EmailVerificationEnricher $emailVerification,
         private EnrichmentPersister $persister,
     ) {}
 
@@ -45,6 +46,12 @@ class EnrichmentService
 
         try {
             $this->places->enrich($workspace, $targetType, $target);
+        } catch (TransientEnrichmentException $exception) {
+            $transientFailure ??= $exception;
+        }
+
+        try {
+            $this->emailVerification->enrich($workspace, $targetType, $target);
         } catch (TransientEnrichmentException $exception) {
             $transientFailure ??= $exception;
         }

@@ -11,6 +11,7 @@ No feature in the requested three-system expansion is marked complete merely bec
 - Calculator math, input bounds, rounding, reset behavior, and assumption labeling.
 - Domain normalization for emails, domains, phone numbers, company names, and categorical values.
 - Verification/field-evidence precedence and conflict decisions.
+- Email-verification provider selection, syntax/MX evidence boundaries, unsupported fallback, address binding, and freshness caching.
 - Scoring breakdowns and configurable thresholds.
 - Eligibility policy decisions, including unknown/catch-all email states and suppression.
 - Template rendering and personalization fallbacks without invented claims.
@@ -19,6 +20,7 @@ No feature in the requested three-system expansion is marked complete merely bec
 
 - CSV preview/import with complete, incomplete, malformed, duplicate, and re-imported rows.
 - Enrichment provider success, partial result, stale result, conflict, timeout, retry, and permanent failure.
+- Configured email-verifier projection, disabled-provider error visibility, and repeat-run cache behavior.
 - Workspace authorization, pagination, filtering, and duplicate review.
 - Workspace-scoped bulk enrichment queueing, cross-workspace ID rejection, unique job keys, and retry configuration.
 - Campaign creation/editing, activation, preview/test send, last-mile suppression check, mailbox and per-campaign daily limits, quiet hours, and duplicate send prevention.

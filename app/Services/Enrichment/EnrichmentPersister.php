@@ -31,6 +31,7 @@ class EnrichmentPersister
         string $verificationStatus = EnrichmentRun::VERIFICATION_EVIDENCE_SUPPORTED,
         ?string $evidenceUrl = null,
         ?Carbon $retrievedAt = null,
+        ?string $error = null,
     ): EnrichmentRun {
         $value = $this->normalizeValue($field, $value);
         $verificationStatus = $this->normalizeVerificationStatus($verificationStatus);
@@ -82,6 +83,7 @@ class EnrichmentPersister
             'evidence_url' => $evidenceUrl ?: $this->evidenceUrl($raw),
             'retrieved_at' => $retrievedAt ?? now(),
             'verified_at' => $verificationStatus === EnrichmentRun::VERIFICATION_VERIFIED ? ($retrievedAt ?? now()) : null,
+            'error' => $error,
         ]);
 
         if ($field === 'email') {
@@ -130,21 +132,39 @@ class EnrichmentPersister
         string $field,
         string $error,
         array $raw = [],
+        ?string $value = null,
+        string $verificationStatus = EnrichmentRun::VERIFICATION_UNKNOWN,
     ): EnrichmentRun {
-        return EnrichmentRun::query()->create([
+        $run = EnrichmentRun::query()->create([
             'workspace_id' => $workspace->id,
             'target_type' => $targetType,
             'target_id' => $targetId,
             'source' => $source,
             'field' => $field,
-            'value' => null,
+            'value' => $value !== null ? $this->normalizeValue($field, $value) : null,
             'confidence' => 0,
             'raw' => $raw,
             'status' => EnrichmentRun::STATUS_FAILED,
-            'verification_status' => EnrichmentRun::VERIFICATION_UNKNOWN,
+            'verification_status' => $this->normalizeVerificationStatus($verificationStatus),
             'retrieved_at' => now(),
             'error' => $error,
         ]);
+
+        if ($field === 'email' && $value !== null) {
+            $this->recordEmailVerification($this->resolveTarget($workspace, $targetType, $targetId), $run);
+        }
+
+        return $run;
+    }
+
+    private function resolveTarget(Workspace $workspace, string $targetType, int $targetId): Company|Contact|Lead
+    {
+        return match ($targetType) {
+            EnrichmentRun::TARGET_COMPANY => Company::query()->forWorkspace($workspace)->findOrFail($targetId),
+            EnrichmentRun::TARGET_CONTACT => Contact::query()->forWorkspace($workspace)->findOrFail($targetId),
+            EnrichmentRun::TARGET_LEAD => Lead::query()->forWorkspace($workspace)->with('contact')->findOrFail($targetId),
+            default => throw new \InvalidArgumentException('Unknown enrichment target type.'),
+        };
     }
 
     /**

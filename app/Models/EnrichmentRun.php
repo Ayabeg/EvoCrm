@@ -42,6 +42,8 @@ class EnrichmentRun extends Model
 
     public const SOURCE_GOOGLE_PLACES = 'google_places';
 
+    public const SOURCE_EMAIL_VERIFICATION = 'email_verification';
+
     public const SOURCE_APOLLO = 'apollo';
 
     public const SOURCE_CLAY = 'clay';
@@ -88,6 +90,7 @@ class EnrichmentRun extends Model
     public const IMPLEMENTED_SOURCES = [
         self::SOURCE_WEBSITE,
         self::SOURCE_GOOGLE_PLACES,
+        self::SOURCE_EMAIL_VERIFICATION,
     ];
 
     /**

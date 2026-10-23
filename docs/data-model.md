@@ -11,7 +11,7 @@
 | `activities` | CRM timeline | Record meaningful submissions, enrichment decisions, sends, replies, and outcomes |
 | `contact_consents` | Channel-specific consent | Delivery consent and optional marketing consent remain distinct |
 | `lead_captures` | Existing inbound capture staging | Reuse for raw inbound capture where compatible; add a first-class offer reference rather than duplicating captures |
-| `enrichment_runs` | Existing field-level enrichment candidates | Preserve source, field, value, confidence, status, raw evidence, and decision metadata |
+| `enrichment_runs` | Existing field-level enrichment candidates and verification outcomes | Preserve source, field, value, confidence, status, raw evidence, verification status, errors, and decision metadata |
 | `lead_scores` | Existing scored lead snapshots | Keep data quality separate from sales fit; extend carefully if the current schema cannot represent both |
 | `import_batches` | Existing import lifecycle | Add column mapping/row error detail through existing import conventions |
 | outbound tables | Mailboxes, templates, sequences, campaigns, enrollments, messages, suppressions, replies | All sends use existing suppression and idempotency paths |
@@ -45,6 +45,8 @@ The current `enrichment_runs` table is a candidate/evidence ledger, but the broa
 - decision (`accepted`, `rejected`, `needs_review`) and reason.
 
 For email fields, the current-address projection also stores the exact email, status, source, evidence URL, retrieval time, confidence, and run ID on `contacts.meta.email_verification` so outbound eligibility consumes the same provenance without a competing verification table. Proposals for another address stay in `enrichment_runs` history and do not replace the current address's projection; stronger current-address evidence is retained when later evidence is weaker or inconclusive.
+
+Email verification runs use the `email_verification` source. The provider is selected by `EVOSALES_EMAIL_VERIFICATION_DRIVER` and is disabled by default; `dns` records syntax and MX evidence only. A fresh result for the same workspace, target, and normalized address is reused for `EVOSALES_EMAIL_VERIFICATION_CACHE_HOURS` (168 hours by default). Unsupported, temporary-failure, invalid, not-found, and evidence-only results remain traceable and fail closed for outbound eligibility.
 
 Outbound email sequences and broadcast campaigns persist an `email_verification_policy` (`strict`, `allow_catch_all`, `allow_unknown`, or `allow_uncertain`). `strict` is the database default. A permissive target policy is not sufficient by itself: the deployment must also explicitly disable the matching global block. Only `verified` is unconditional deliverability proof; evidence-only, not-found, not-detected, conflicting, missing, invalid, temporary-failure, and unsupported results remain blocked. An explicit authenticated mailbox test send is operational plumbing, not campaign eligibility.
 

@@ -1,5 +1,11 @@
 # EvoCRM acquisition systems progress log
 
+## 2026-10-23 — modular email verification
+
+### Completed / verified
+
+- Added the modular email-verification leg to enrichment: a provider contract, disabled-by-default fail-closed fallback, optional DNS syntax/MX evidence adapter, address-bound projection, and workspace/target/address freshness cache. The focused enrichment suite passes 17 tests / 123 assertions; the cross-system acquisition slice passes 68 tests / 394 assertions; Pint passes. DNS evidence is explicitly not mailbox proof.
+
 ## 2026-10-21 — initial audit and planning
 
 ### Completed / verified
