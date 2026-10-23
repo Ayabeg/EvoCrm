@@ -11,6 +11,7 @@ use App\Models\SavedFilter;
 use App\Models\Workspace;
 use App\Services\Analytics\ProductAnalytics;
 use App\Services\Crm\CrmFilter;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -358,7 +359,8 @@ class CampaignService
                 ->whereIn('campaign_id', $campaignIds)
                 ->where('direction', 'out')
                 ->where('status', 'sent')
-                ->whereDate('sent_at', now()->toDateString())
+                ->where('sent_at', '>=', $this->workspaceDayStart($messages->first()->workspace))
+                ->where('sent_at', '<', $this->workspaceDayStart($messages->first()->workspace)->copy()->addDay())
                 ->selectRaw('campaign_id, COUNT(*) as aggregate')
                 ->groupBy('campaign_id')
                 ->pluck('aggregate', 'campaign_id')
@@ -407,7 +409,7 @@ class CampaignService
             $campaignDailyLimit = (int) ($campaign->daily_limit ?? 20);
             if ($campaignDailyLimit > 0 && (int) ($sentTodayByCampaign[$campaign->id] ?? 0) >= $campaignDailyLimit) {
                 $message->forceFill([
-                    'deferred_until' => now()->addDay()->startOfDay(),
+                    'deferred_until' => $this->workspaceDayStart($workspace)->copy()->addDay(),
                     'defer_reason' => 'campaign_daily_cap',
                 ])->save();
                 $totals['deferred']++;
@@ -463,6 +465,17 @@ class CampaignService
         $this->completeFinishedCampaigns();
 
         return $totals;
+    }
+
+    private function workspaceDayStart(Workspace $workspace): CarbonInterface
+    {
+        $workspaceTimezone = (string) ($workspace->timezone ?: config('app.timezone', 'UTC'));
+        $databaseTimezone = (string) config('app.timezone', 'UTC');
+
+        return now()
+            ->setTimezone($workspaceTimezone)
+            ->startOfDay()
+            ->setTimezone($databaseTimezone);
     }
 
     private function idempotencyKey(OutboundCampaign $campaign, Contact $contact): string

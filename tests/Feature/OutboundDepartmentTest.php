@@ -183,6 +183,41 @@ it('defers campaign messages at the campaign daily cap and resumes next day', fu
         ->and($campaign->refresh()->status)->toBe(OutboundCampaign::STATUS_SENT);
 });
 
+it('uses the workspace timezone for campaign daily-cap rollover', function () {
+    $this->travelTo(Carbon::parse('2026-08-23 18:00:00', 'Africa/Algiers'));
+
+    $user = User::factory()->create();
+    $user->workspace->update(['timezone' => 'America/New_York']);
+    enabledMailbox($user, ['daily_limit' => 50]);
+    Contact::factory()->withVerifiedEmail()->count(2)->create(['workspace_id' => $user->workspace_id]);
+
+    $campaign = OutboundCampaign::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'daily_limit' => 1,
+    ]);
+    app(CampaignService::class)->expand($campaign);
+
+    $this->artisan('outbound:run')->assertSuccessful();
+    expect(OutboundMessage::query()->where('campaign_id', $campaign->id)->where('status', 'sent')->count())->toBe(1);
+
+    // 03:30 in Algiers is still 22:30 on the previous day in New York.
+    $this->travelTo(Carbon::parse('2026-08-24 03:30:00', 'Africa/Algiers'));
+    $this->artisan('outbound:run')->assertSuccessful();
+
+    $deferred = OutboundMessage::query()
+        ->where('campaign_id', $campaign->id)
+        ->where('status', 'queued')
+        ->firstOrFail();
+    expect($deferred->defer_reason)->toBe('campaign_daily_cap')
+        ->and($deferred->deferred_until->format('Y-m-d H:i'))->toBe('2026-08-24 05:00');
+
+    $this->travelTo(Carbon::parse('2026-08-24 10:00:00', 'Africa/Algiers'));
+    $this->artisan('outbound:run')->assertSuccessful();
+
+    expect(OutboundMessage::query()->where('campaign_id', $campaign->id)->where('status', 'sent')->count())->toBe(2)
+        ->and($campaign->refresh()->status)->toBe(OutboundCampaign::STATUS_SENT);
+});
+
 it('fails a campaign message honestly when the contact is suppressed after expansion', function () {
     $this->travelTo(Carbon::parse('2026-08-23 10:00:00', 'Africa/Algiers'));
 
