@@ -111,6 +111,7 @@ Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update
 Route::get('/terms', [LegalController::class, 'terms'])->name('legal.terms');
 Route::get('/privacy', [LegalController::class, 'privacy'])->name('legal.privacy');
 Route::get('/lead-magnet/{workspace:slug}/lead-leakage-calculator', [LeadLeakageController::class, 'show'])
+    ->middleware('throttle:120,1')
     ->name('lead-magnet.lead-leakage.show');
 Route::post('/lead-magnet/{workspace:slug}/lead-leakage-calculator', [LeadLeakageController::class, 'store'])
     ->middleware('throttle:20,1')

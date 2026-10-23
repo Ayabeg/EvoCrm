@@ -68,6 +68,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Delivery-diagnostic redaction follow-up: **34 tests / 345 assertions passed** across public lead magnet, inbound acquisition, outbound reporting, and scoring paths; provider errors are redacted before persistence as well as omitted from public props.
 - Durable campaign expansion diagnostics now use the same redaction contract; the focused outbound expansion/redaction gate passes **28 tests / 185 assertions**.
 - The latest connected acquisition/inbound/enrichment/outbound/funnel/scoring gate passes **114 tests / 807 assertions**; `npm run types:check` and targeted Pint pass.
+- Public lead-magnet landing-page visits are now throttled at 120 requests/minute; the focused lead-magnet/inbound gate passes **11 tests / 108 assertions**.
 - Production Vite build passed after the outbound reporting and scoring UI changes; existing font fallback, chunk-size, and ineffective dynamic-import warnings remain.
 - Full PHP regression after robots enforcement: **1,363 tests; 1,354 passed; 8 existing branding/design-system/automation contract failures; 35,852 assertions; 1 skipped**. No acquisition test failed.
 - Full PHP regression after evidence-aware outbound reporting: **1,364 tests; 1,355 passed; 8 existing branding/design-system/automation contract failures; 35,878 assertions; 1 skipped**. No acquisition/report test failed; the two existing `InvalidArgumentException` import warnings remain unchanged.

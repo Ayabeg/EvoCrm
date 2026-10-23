@@ -12,6 +12,7 @@ use App\Models\MeetingSchedule;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 
@@ -30,6 +31,11 @@ it('renders the workspace lead leakage calculator publicly', function () {
         ->where('source', 'lead_magnet')
         ->whereJsonContains('meta->offer', 'lead-leakage-calculator')
         ->count())->toBe(1);
+});
+
+it('throttles public lead-magnet landing-page visits', function () {
+    expect(Route::getRoutes()->getByName('lead-magnet.lead-leakage.show')?->middleware())
+        ->toContain('throttle:120,1');
 });
 
 it('records a bounded lead-magnet form-start event', function () {

@@ -1,5 +1,16 @@
 # EvoCRM acquisition systems progress log
 
+## 2026-10-23 — lead-magnet visit abuse boundary
+
+### Completed / verified
+
+- Added a `120 requests/minute` throttle to the public calculator landing page so visit attribution cannot be used to write unbounded funnel rows from one client.
+- Added a route-contract regression alongside the public/inbound tests; the focused lead-magnet/inbound gate passes **11 tests / 108 assertions** with Pint, PHP syntax, and `git diff --check` passing.
+
+### Remaining
+
+- Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
+
 ## 2026-10-23 — durable expansion diagnostic redaction
 
 ### Completed / verified
