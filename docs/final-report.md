@@ -1,6 +1,6 @@
 # Acquisition systems release report
 
-Current implementation revision: working tree after `dea586da` (outbound reporting increment; release report is maintained in subsequent documentation commits)
+Current implementation revision: `cf0268a1` (`main`; release report is maintained in subsequent documentation commits)
 
 This report records the current verified state of Dead Enrichment, EvoCRM Outbound, and Dead Magnet. It is a release-readiness report, not a claim that live providers or the unrelated repository UI contracts are production-ready.
 
@@ -59,6 +59,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Robots/enrichment regression: **7 tests / 27 assertions passed**; the combined website/provider/acquisition slice passed **78 tests / 439 assertions** with Pint.
 - Outbound report regression: **9 tests / 138 assertions passed**; targeted Pint, TypeScript, and `git diff --check` passed.
 - Lead-scoring regression: **13 tests / 80 assertions passed**; targeted Pint and TypeScript passed.
+- Production Vite build passed after the outbound reporting and scoring UI changes; existing font fallback, chunk-size, and ineffective dynamic-import warnings remain.
 - Full PHP regression after robots enforcement: **1,363 tests; 1,354 passed; 8 existing branding/design-system/automation contract failures; 35,852 assertions; 1 skipped**. No acquisition test failed.
 - Full PHP regression after evidence-aware outbound reporting: **1,364 tests; 1,355 passed; 8 existing branding/design-system/automation contract failures; 35,878 assertions; 1 skipped**. No acquisition/report test failed; the two existing `InvalidArgumentException` import warnings remain unchanged.
 - Full PHP regression after configurable lead-scoring rules: **1,365 tests; 1,356 passed; 8 existing branding/design-system/automation contract failures; 35,885 assertions; 1 skipped**. No acquisition-system test failed; the two existing `InvalidArgumentException` import warnings remain unchanged.

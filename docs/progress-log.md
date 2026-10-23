@@ -22,6 +22,7 @@
 - Moved fit, intent, timing, and data-quality rule points into the central `evosales.lead_score.rules` defaults and added bounded workspace overrides through the existing Qualification settings.
 - Preserved threshold-only updates by merging omitted rule values with the current workspace/default rules; score snapshots continue to retain the applied explainable breakdown.
 - Added regression coverage proving workspace rule changes alter the computed score without changing the separate threshold/action path. The lead-scoring suite passes **13 tests / 80 assertions**; Pint and `npm run types:check` pass.
+- The production Vite build passes after the outbound reporting and scoring UI changes; only the repository's existing font fallback, chunk-size, and ineffective dynamic-import warnings remain.
 - The full PHP regression after this increment is **1,365 tests; 1,356 passed; 8 existing branding/design-system/automation contract failures; 35,885 assertions; 1 skipped**. No acquisition-system test failed; the two existing `InvalidArgumentException` import warnings remain unchanged.
 
 ### Remaining
