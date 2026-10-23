@@ -11,6 +11,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Enrichment providers are isolated within a run: transient failures remain retryable, while successful partial results from other providers are preserved.
 - Email verification now has a modular provider contract, disabled-by-default fail-closed fallback, optional DNS syntax/MX evidence, address-bound projection, and freshness caching. DNS evidence is explicitly not mailbox-level deliverability proof.
 - An approved verifier can be connected through the authenticated HTTP adapter, which normalizes documented statuses, bounds stored response evidence, and retries transport/429/5xx failures without persisting credentials.
+- Website enrichment honors `robots.txt` before every public fetch hop, caches policy by origin, and records a skip instead of scraping when a site disallows access or its policy cannot be verified.
 - EvoCRM Outbound eligibility, suppression rechecks, explicit consent policy, template rendering, sanitized HTML, preview, campaign and sequence execution, quiet hours, mailbox caps, durable send claims, provider-event idempotency, reply classification, unsubscribe handling, and interested-reply tasks.
 - Broadcast campaigns can be edited while draft or scheduled, with workspace-scoped audience/template/mailbox relationships; started campaigns remain immutable.
 - Broadcast campaigns persist a configurable 20/day default cap; excess messages remain queued with a durable defer reason and resume on the next day, while mailbox caps remain independently enforced.
@@ -53,6 +54,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Signed lead-magnet booking regression: **20 tests / 195 assertions passed** across public calculator, meeting, and inbound workflow paths; Pint, targeted ESLint, TypeScript, and `git diff --check` passed.
 - Email-verification provider/cache regression: **17 tests / 123 assertions passed**; the cross-system enrichment/outbound slice passed **68 tests / 394 assertions** with Pint. The disabled provider records an explanatory unsupported result, while an injected provider is cached per current address.
 - HTTP verifier/retry regression: **3 tests / 18 assertions passed**; the broader provider/enrichment/outbound slice passed **71 tests / 412 assertions** with Pint and `git diff --check`.
+- Robots/enrichment regression: **7 tests / 27 assertions passed**; the combined website/provider/acquisition slice passed **78 tests / 439 assertions** with Pint.
 - The production Vite build passes after the signed booking handoff; only the repository's existing optional-font, chunk-size, and ineffective dynamic-import warnings remain.
 - Partial-provider enrichment regression: **14 tests / 113 assertions passed** for enrichment, including a transient website failure with a retained Google Places result; the broader acquisition slice passed **39 tests / 284 assertions** and Pint passed.
 - Address-bound verification regression: **19 tests / 127 assertions passed** across enrichment and outbound policy, covering stale-address mismatch and preservation of stronger evidence; Pint and `git diff --check` passed.
@@ -87,6 +89,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - `58e83570` — signed lead-magnet booking attribution through the public meeting form.
 - `ed59f1b5` — modular email-verification provider contract, disabled fallback, optional DNS evidence, and cache coverage.
 - `93b93be9` — authenticated HTTP email-verification adapter, normalized provider response handling, and temporary-failure retry preservation.
+- Next code increment — robots-aware public website enrichment with redirect-hop enforcement; commit pending after the full regression.
 
 ## Implemented but not fully verified
 

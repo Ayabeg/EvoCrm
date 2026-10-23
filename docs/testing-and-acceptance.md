@@ -22,6 +22,7 @@ No feature in the requested three-system expansion is marked complete merely bec
 
 - CSV preview/import with complete, incomplete, malformed, duplicate, and re-imported rows.
 - Enrichment provider success, partial result, stale result, conflict, timeout, retry, and permanent failure.
+- Robots policy parsing, disallowed-page skips, policy-unavailable fail-closed behavior, and rechecking after redirects.
 - Configured email-verifier projection, disabled-provider error visibility, and repeat-run cache behavior.
 - Workspace authorization, pagination, filtering, and duplicate review.
 - Workspace-scoped bulk enrichment queueing, cross-workspace ID rejection, unique job keys, and retry configuration.

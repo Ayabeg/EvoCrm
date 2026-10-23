@@ -4,6 +4,7 @@ namespace App\Services\Enrichment;
 
 use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\Psr7\UriResolver;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Throwable;
 
@@ -12,7 +13,7 @@ final class WebsiteFetcher
     /**
      * Fetch a public http(s) page. Private hosts are rejected (SSRF).
      *
-     * @return array{ok: bool, body?: string, error?: string, status?: int, retryable?: bool}
+     * @return array{ok: bool, body?: string, error?: string, status?: int, retryable?: bool, robots_blocked?: bool}
      */
     public function get(string $url): array
     {
@@ -23,6 +24,16 @@ final class WebsiteFetcher
         }
 
         for ($redirect = 0; $redirect <= 2; $redirect++) {
+            $robots = $this->robotsPolicy($normalized);
+
+            if (($robots['allowed'] ?? false) !== true) {
+                return [
+                    'ok' => false,
+                    'error' => $robots['error'] ?? 'Website fetch is disallowed by robots.txt.',
+                    'robots_blocked' => true,
+                ];
+            }
+
             $request = $this->publicRequestOptions($normalized);
 
             if ($request === false) {
@@ -78,6 +89,35 @@ final class WebsiteFetcher
     }
 
     /**
+     * Parse a robots policy for a URL without making a network request. This
+     * is public for deterministic parser coverage; production fetches use the
+     * cached policy returned by robotsPolicy().
+     */
+    public function pathAllowedByRobots(string $url, string $robotsText): bool
+    {
+        $parts = parse_url($url);
+        $path = is_array($parts) ? (string) ($parts['path'] ?? '/') : '/';
+        $rules = $this->robotsRules($robotsText);
+        $winner = null;
+        $winnerLength = -1;
+
+        foreach ($rules as $rule) {
+            if (! $this->robotsRuleMatches((string) $rule['pattern'], $path)) {
+                continue;
+            }
+
+            $length = strlen((string) $rule['pattern']);
+
+            if ($length > $winnerLength || ($length === $winnerLength && $rule['allow'] === true)) {
+                $winner = $rule;
+                $winnerLength = $length;
+            }
+        }
+
+        return ! is_array($winner) || $winner['allow'] === true;
+    }
+
+    /**
      * Validate a public URL and pin its first public DNS answer for one
      * outbound request. The hostname remains in the URL for TLS and Host.
      *
@@ -124,6 +164,138 @@ final class WebsiteFetcher
         } catch (Throwable) {
             return null;
         }
+    }
+
+    /**
+     * @return array{allowed: bool, error?: string}
+     */
+    private function robotsPolicy(string $url): array
+    {
+        if (! (bool) config('evosales.enrichment.respect_robots', true)
+            || (app()->environment('testing') && ! (bool) config('evosales.enrichment.force_robots_in_tests', false))) {
+            return ['allowed' => true];
+        }
+
+        $parts = parse_url($url);
+
+        if (! is_array($parts) || ! isset($parts['scheme'], $parts['host'])) {
+            return ['allowed' => false, 'error' => 'Website address has no valid robots policy host.'];
+        }
+
+        $origin = strtolower((string) $parts['scheme']).'://'.strtolower((string) $parts['host']);
+
+        if (isset($parts['port'])) {
+            $origin .= ':'.(int) $parts['port'];
+        }
+
+        $robotsUrl = $origin.'/robots.txt';
+        $cacheKey = 'enrichment:robots:'.sha1($origin);
+        $policy = Cache::remember($cacheKey, now()->addHour(), function () use ($robotsUrl): array {
+            $request = $this->publicRequestOptions($robotsUrl);
+
+            if ($request === false) {
+                return ['mode' => 'deny', 'error' => 'Website robots policy points to a blocked network.'];
+            }
+
+            try {
+                $response = Http::timeout(5)
+                    ->withHeaders([
+                        'User-Agent' => 'EvoSales-Enrich/1.0 (+https://evotechly.com)',
+                        'Accept' => 'text/plain',
+                    ])
+                    ->withOptions($request['options'])
+                    ->get($request['url']);
+            } catch (Throwable) {
+                return ['mode' => 'deny', 'error' => 'Could not verify the website robots policy.'];
+            }
+
+            if ($response->status() === 404) {
+                return ['mode' => 'allow'];
+            }
+
+            if (! $response->successful()) {
+                return ['mode' => 'deny', 'error' => 'Could not verify the website robots policy.'];
+            }
+
+            return [
+                'mode' => 'rules',
+                'text' => substr((string) $response->body(), 0, 64_000),
+            ];
+        });
+
+        if (($policy['mode'] ?? 'deny') === 'allow') {
+            return ['allowed' => true];
+        }
+
+        if (($policy['mode'] ?? 'deny') === 'rules'
+            && $this->pathAllowedByRobots($url, (string) ($policy['text'] ?? ''))) {
+            return ['allowed' => true];
+        }
+
+        return [
+            'allowed' => false,
+            'error' => (string) ($policy['error'] ?? 'Website fetch is disallowed by robots.txt.'),
+        ];
+    }
+
+    /**
+     * @return list<array{allow: bool, pattern: string}>
+     */
+    private function robotsRules(string $robotsText): array
+    {
+        $rules = [];
+        $agents = [];
+        $groupHasDirectives = false;
+
+        foreach (preg_split('/\R/', $robotsText) ?: [] as $line) {
+            $line = trim((string) preg_replace('/\s*#.*$/', '', $line));
+
+            if ($line === '' || ! str_contains($line, ':')) {
+                continue;
+            }
+
+            [$field, $value] = array_map('trim', explode(':', $line, 2));
+            $field = strtolower($field);
+
+            if ($field === 'user-agent') {
+                if ($groupHasDirectives) {
+                    $agents = [];
+                    $groupHasDirectives = false;
+                }
+
+                $agents[] = strtolower($value);
+
+                continue;
+            }
+
+            if (! in_array('*', $agents, true) || ! in_array($field, ['allow', 'disallow'], true)) {
+                continue;
+            }
+
+            $groupHasDirectives = true;
+            $value = trim($value);
+
+            if ($value === '') {
+                continue;
+            }
+
+            $rules[] = [
+                'allow' => $field === 'allow',
+                'pattern' => $value,
+            ];
+        }
+
+        return $rules;
+    }
+
+    private function robotsRuleMatches(string $pattern, string $path): bool
+    {
+        $end = str_ends_with($pattern, '$');
+        $pattern = $end ? substr($pattern, 0, -1) : $pattern;
+        $regex = preg_quote($pattern, '#');
+        $regex = str_replace('\\*', '.*', $regex);
+
+        return preg_match('#^'.$regex.($end ? '$' : '').'#', $path) === 1;
     }
 
     public function normalizeUrl(?string $raw): ?string

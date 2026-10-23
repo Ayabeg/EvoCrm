@@ -37,6 +37,20 @@ class WebsiteEnricher
         $fetched = $this->fetcher->get($url);
 
         if (! $fetched['ok']) {
+            if (($fetched['robots_blocked'] ?? false) === true) {
+                $this->runs->persistSkip(
+                    $workspace,
+                    $targetType,
+                    (int) $target->id,
+                    EnrichmentRun::SOURCE_WEBSITE,
+                    'url',
+                    $fetched['error'] ?? 'Website fetch is disallowed by robots.txt.',
+                    ['url' => $url, 'robots' => true],
+                );
+
+                return;
+            }
+
             $this->runs->persistFailure(
                 $workspace,
                 $targetType,

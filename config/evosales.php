@@ -99,6 +99,9 @@ return [
     'enrichment' => [
         // Queue middleware uses this workspace-scoped budget for all provider calls.
         'records_per_minute' => (int) env('EVOSALES_ENRICHMENT_RECORDS_PER_MINUTE', 30),
+        // Public website enrichment checks robots.txt before fetching pages.
+        'respect_robots' => (bool) env('EVOSALES_ENRICHMENT_RESPECT_ROBOTS', true),
+        'force_robots_in_tests' => false,
         // Disabled by default: DNS evidence is not mailbox verification.
         'email_verification_driver' => env('EVOSALES_EMAIL_VERIFICATION_DRIVER', 'disabled'),
         'email_verification_provider' => env('EVOSALES_EMAIL_VERIFICATION_PROVIDER', 'http'),
