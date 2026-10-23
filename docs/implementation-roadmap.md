@@ -42,7 +42,7 @@ Status vocabulary: **planned**, **in progress**, **blocked**, **implemented**, a
 
 ## Risks and unresolved decisions
 
-- **External credentials:** Google Places, mail-stack API, SMTP/IMAP, and provider-backed email verification remain environment-dependent. The email-verification contract, disabled fallback, and safe DNS-evidence adapter are locally testable; mailbox-level verification remains blocked until an approved provider is configured.
+- **External credentials:** Google Places, mail-stack API, SMTP/IMAP, and provider-backed email verification remain environment-dependent. The email-verification contract, disabled fallback, safe DNS-evidence adapter, and authenticated HTTP adapter are locally testable; live mailbox-level semantics remain blocked until an approved provider is configured and tested.
 - **Legal/compliance:** public-data collection, email outreach, consent, retention, and applicable anti-spam/privacy rules require product/legal confirmation for each market. The implementation will remain conservative by default.
 - **Schema evolution:** existing migrations already contain enrichment, capture, scoring, import, and outbound tables. New tables must extend those sources of truth instead of duplicating them.
 - **No fabricated evidence:** unavailable enrichment fields remain unknown; estimates in the calculator are explicitly user-provided assumptions.

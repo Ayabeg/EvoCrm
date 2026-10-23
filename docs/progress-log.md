@@ -5,6 +5,7 @@
 ### Completed / verified
 
 - Added the modular email-verification leg to enrichment: a provider contract, disabled-by-default fail-closed fallback, optional DNS syntax/MX evidence adapter, address-bound projection, and workspace/target/address freshness cache. The focused enrichment suite passes 17 tests / 123 assertions; the cross-system acquisition slice passes 68 tests / 394 assertions; Pint passes. DNS evidence is explicitly not mailbox proof.
+- Added the configurable authenticated HTTP email-verification adapter: normalized valid/invalid/catch-all/unknown outcomes, bounded provider evidence, secret-free persistence, retryable transport/429/5xx failures, and a cache rule that never suppresses temporary-failure retries. Provider/unit plus acquisition coverage passes 71 tests / 412 assertions; Pint and `git diff --check` pass.
 
 ## 2026-10-21 — initial audit and planning
 

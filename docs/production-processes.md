@@ -154,6 +154,7 @@ Pilot / hardening values the Contabo `.env` should also set (repo compose is ref
 - `MAIL_MAILER=resend`, `RESEND_API_KEY`, `MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME`
 - `POSTHOG_API_KEY` + `POSTHOG_HOST` — leave empty to disable capture
 - `QUEUE_CONNECTION=database` — uses `jobs` / `failed_jobs`; worker `--tries=3 --backoff=3 --max-time=3600`
+- `EVOSALES_EMAIL_VERIFICATION_DRIVER=disabled` by default. If an approved verifier is configured, set `http`, provide its normalized JSON endpoint and secret through `EVOSALES_EMAIL_VERIFICATION_URL` / `EVOSALES_EMAIL_VERIFICATION_API_KEY`, then test valid, invalid, catch-all, unknown, and provider-outage responses in a controlled environment. Never send arbitrary test emails.
 
 Scheduler liveness: `GET /up/scheduler` (public JSON) and Settings → System health (`schedule:heartbeat`, every minute).
 

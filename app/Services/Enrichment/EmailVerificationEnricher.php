@@ -29,18 +29,20 @@ final class EmailVerificationEnricher
         }
 
         $cacheHours = max(0, (int) config('evosales.enrichment.email_verification_cache_hours', 168));
-        $cached = EnrichmentRun::query()
+        $cachedRun = EnrichmentRun::query()
             ->forWorkspace($workspace)
             ->where('target_type', $targetType)
             ->where('target_id', $target->id)
             ->where('source', EnrichmentRun::SOURCE_EMAIL_VERIFICATION)
             ->where('field', 'email')
             ->where('value', $email)
-            ->where('retrieved_at', '>=', now()->subHours($cacheHours))
             ->latest('id')
-            ->exists();
+            ->first();
 
-        if ($cached) {
+        if ($cachedRun instanceof EnrichmentRun
+            && $cachedRun->retrieved_at?->gte(now()->subHours($cacheHours))
+            && $cachedRun->verification_status !== EnrichmentRun::VERIFICATION_TEMPORARY_FAILURE
+            && data_get($cachedRun->raw, 'provider') === $this->provider->name()) {
             return;
         }
 

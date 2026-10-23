@@ -337,6 +337,51 @@ it('records disabled email verification as unsupported and keeps outbound eligib
         ->and(data_get($contact->fresh()->meta, 'email_verification.status'))->toBe(EnrichmentRun::VERIFICATION_UNSUPPORTED);
 });
 
+it('does not cache temporary verifier failures over the retry window', function () {
+    $provider = new class implements EmailVerificationProvider
+    {
+        public int $calls = 0;
+
+        public function name(): string
+        {
+            return 'flaky-verifier';
+        }
+
+        public function verify(string $email): array
+        {
+            $this->calls++;
+
+            if ($this->calls === 1) {
+                throw new TransientEnrichmentException('Provider timeout.');
+            }
+
+            return [
+                'status' => EnrichmentRun::VERIFICATION_VERIFIED,
+                'confidence' => 0.99,
+                'raw' => [],
+            ];
+        }
+    };
+    app()->instance(EmailVerificationProvider::class, $provider);
+
+    $user = User::factory()->create();
+    $contact = Contact::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'email' => 'owner@clinic-atlas.dz',
+    ]);
+
+    expect(fn () => app(EnrichmentService::class)->enrich(
+        $user->workspace,
+        EnrichmentRun::TARGET_CONTACT,
+        (int) $contact->id,
+    ))->toThrow(TransientEnrichmentException::class);
+
+    app(EnrichmentService::class)->enrich($user->workspace, EnrichmentRun::TARGET_CONTACT, (int) $contact->id);
+
+    expect($provider->calls)->toBe(2)
+        ->and(data_get($contact->fresh()->meta, 'email_verification.status'))->toBe(EnrichmentRun::VERIFICATION_VERIFIED);
+});
+
 it('keeps email verification tied to the current address and preserves stronger evidence', function () {
     $user = User::factory()->create();
     $contact = Contact::factory()->create([

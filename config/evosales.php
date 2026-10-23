@@ -101,6 +101,10 @@ return [
         'records_per_minute' => (int) env('EVOSALES_ENRICHMENT_RECORDS_PER_MINUTE', 30),
         // Disabled by default: DNS evidence is not mailbox verification.
         'email_verification_driver' => env('EVOSALES_EMAIL_VERIFICATION_DRIVER', 'disabled'),
+        'email_verification_provider' => env('EVOSALES_EMAIL_VERIFICATION_PROVIDER', 'http'),
+        'email_verification_url' => env('EVOSALES_EMAIL_VERIFICATION_URL'),
+        'email_verification_api_key' => env('EVOSALES_EMAIL_VERIFICATION_API_KEY'),
+        'email_verification_timeout' => (int) env('EVOSALES_EMAIL_VERIFICATION_TIMEOUT', 8),
         'email_verification_cache_hours' => (int) env('EVOSALES_EMAIL_VERIFICATION_CACHE_HOURS', 168),
     ],
 

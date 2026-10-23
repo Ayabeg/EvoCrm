@@ -36,6 +36,7 @@ use App\Services\Desk\TwilioSmsClient;
 use App\Services\Enrichment\DisabledEmailVerificationProvider;
 use App\Services\Enrichment\DnsEmailVerificationProvider;
 use App\Services\Enrichment\EmailVerificationProvider;
+use App\Services\Enrichment\HttpEmailVerificationProvider;
 use App\Services\Identity\WorkspaceProvisioner;
 use App\Services\Operations\AuditLogger;
 use App\Services\Operations\ScheduledTaskMonitor;
@@ -83,9 +84,11 @@ class AppServiceProvider extends ServiceProvider
         });
         $this->app->singleton(ProductAnalytics::class);
         $this->app->singleton(EmailVerificationProvider::class, function ($app) {
-            return config('evosales.enrichment.email_verification_driver') === 'dns'
-                ? $app->make(DnsEmailVerificationProvider::class)
-                : $app->make(DisabledEmailVerificationProvider::class);
+            return match (config('evosales.enrichment.email_verification_driver')) {
+                'dns' => $app->make(DnsEmailVerificationProvider::class),
+                'http' => $app->make(HttpEmailVerificationProvider::class),
+                default => $app->make(DisabledEmailVerificationProvider::class),
+            };
         });
     }
 

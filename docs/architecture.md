@@ -49,6 +49,8 @@ Use provider adapters and the existing `EnrichmentService`, `WebsiteEnricher`, `
 
 Email verification now has an explicit `EmailVerificationProvider` contract, a disabled-by-default provider that records `unsupported` honestly, and an optional safe DNS adapter. The DNS adapter validates syntax and records MX evidence as `evidence_supported`; it never performs SMTP probing, sends test messages, or claims that a mailbox exists. Results are cached per workspace/target/address for the configured freshness window, and stale or provider-backed results remain visible in the existing enrichment ledger.
 
+An approved HTTP verifier can be selected with `EVOSALES_EMAIL_VERIFICATION_DRIVER=http`. Its adapter sends the normalized address over an authenticated request, maps only the documented normalized response statuses, stores a bounded evidence subset, retries transport/429/5xx failures through the enrichment job, and never persists the API key or the provider's unbounded response.
+
 Lead scoring keeps commercial qualification separate from data quality: the existing fit/intent/timing score remains the qualification authority, while `DataQualityScorer` computes an explainable completeness score from the shared company/contact/source fields and persists it with each score snapshot.
 
 ### EvoCRM Outbound
