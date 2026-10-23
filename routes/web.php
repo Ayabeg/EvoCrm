@@ -406,6 +406,7 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class, Enforce
     Route::get('/outbound/campaigns', [CampaignController::class, 'index'])->name('outbound.campaigns.index');
     Route::post('/outbound/campaigns', [CampaignController::class, 'store'])->name('outbound.campaigns.store');
     Route::get('/outbound/campaigns/{campaign}', [CampaignController::class, 'show'])->name('outbound.campaigns.show');
+    Route::put('/outbound/campaigns/{campaign}', [CampaignController::class, 'update'])->name('outbound.campaigns.update');
     Route::post('/outbound/campaigns/{campaign}/send-now', [CampaignController::class, 'sendNow'])->name('outbound.campaigns.send-now');
     Route::post('/outbound/campaigns/{campaign}/schedule', [CampaignController::class, 'schedule'])->name('outbound.campaigns.schedule');
     Route::post('/outbound/campaigns/{campaign}/cancel', [CampaignController::class, 'cancel'])->name('outbound.campaigns.cancel');

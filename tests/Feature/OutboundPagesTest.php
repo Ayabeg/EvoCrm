@@ -6,6 +6,7 @@ use App\Models\Mailbox;
 use App\Models\OutboundCampaign;
 use App\Models\OutboundMessage;
 use App\Models\OutboundTemplate;
+use App\Models\SavedFilter;
 use App\Models\User;
 use App\Services\Outbound\OutboundDispatcher;
 use Illuminate\Support\Carbon;
@@ -104,6 +105,73 @@ it('attributes outbound campaign reporting to won contact revenue', function () 
             ->where('outboundDetail.perCampaign.0.won_deals', 1)
             ->where('outboundDetail.perCampaign.0.won_revenue_cents', 250_000)
         );
+});
+
+it('edits draft and scheduled campaigns within the current workspace', function () {
+    $user = User::factory()->create();
+    $foreign = User::factory()->create();
+    $filter = SavedFilter::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'name' => 'Clinics',
+        'entity' => 'contact',
+        'filters' => [],
+    ]);
+    $foreignFilter = SavedFilter::query()->create([
+        'workspace_id' => $foreign->workspace_id,
+        'name' => 'Foreign',
+        'entity' => 'contact',
+        'filters' => [],
+    ]);
+    $mailbox = Mailbox::factory()->create(['workspace_id' => $user->workspace_id]);
+    $campaign = OutboundCampaign::factory()->create(['workspace_id' => $user->workspace_id]);
+
+    $this->actingAs($user)->put("/outbound/campaigns/{$campaign->id}", [
+        'name' => 'Updated clinic outreach',
+        'saved_filter_id' => $foreignFilter->id,
+        'mailbox_id' => $mailbox->id,
+        'subject' => 'A better subject',
+        'body' => 'Updated body for {{company}}.',
+        'email_verification_policy' => 'strict',
+        'mode' => 'scheduled',
+        'scheduled_at' => '2026-10-25 10:00:00',
+    ])->assertRedirect();
+
+    expect($campaign->refresh()->name)->toBe('Updated clinic outreach')
+        ->and($campaign->status)->toBe(OutboundCampaign::STATUS_SCHEDULED)
+        ->and($campaign->saved_filter_id)->toBeNull()
+        ->and($campaign->mailbox_id)->toBe($mailbox->id)
+        ->and($campaign->scheduled_at?->format('Y-m-d H:i:s'))->toBe('2026-10-25 10:00:00');
+
+    $this->actingAs($user)->put("/outbound/campaigns/{$campaign->id}", [
+        'name' => 'Saved draft',
+        'saved_filter_id' => $filter->id,
+        'subject' => 'Draft subject',
+        'body' => 'Draft body',
+        'email_verification_policy' => 'allow_unknown',
+        'mode' => 'draft',
+    ])->assertRedirect();
+
+    expect($campaign->refresh()->status)->toBe(OutboundCampaign::STATUS_DRAFT)
+        ->and($campaign->saved_filter_id)->toBe($filter->id)
+        ->and($campaign->scheduled_at)->toBeNull()
+        ->and($campaign->email_verification_policy)->toBe('allow_unknown');
+});
+
+it('does not edit a campaign after it has started', function () {
+    $user = User::factory()->create();
+    $campaign = OutboundCampaign::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'status' => OutboundCampaign::STATUS_SENDING,
+        'name' => 'Locked campaign',
+    ]);
+
+    $this->actingAs($user)->put("/outbound/campaigns/{$campaign->id}", [
+        'name' => 'Should not change',
+        'body' => 'Body',
+        'mode' => 'draft',
+    ])->assertStatus(409);
+
+    expect($campaign->refresh()->name)->toBe('Locked campaign');
 });
 
 it('manages email templates with variables', function () {

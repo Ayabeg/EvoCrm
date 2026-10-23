@@ -126,11 +126,27 @@ class CampaignController extends Controller
     {
         abort_unless((int) $campaign->workspace_id === (int) $request->user()->workspace_id, 404);
 
+        $workspace = $request->user()->workspace;
+
         return Inertia::render('outbound/campaigns/show', [
             'campaign' => [
                 ...$campaign->load(['savedFilter:id,name', 'template:id,name', 'mailbox:id,name,from_address'])->toArray(),
                 'counts' => $campaign->messageCounts(),
             ],
+            'filters' => SavedFilter::query()
+                ->forWorkspace($workspace)
+                ->where('entity', 'contact')
+                ->orderBy('name')
+                ->get(['id', 'name']),
+            'templates' => OutboundTemplate::query()
+                ->forWorkspace($workspace)
+                ->orderBy('name')
+                ->get(['id', 'name', 'subject', 'body', 'body_html']),
+            'mailboxes' => Mailbox::query()
+                ->forWorkspace($workspace)
+                ->where('enabled', true)
+                ->orderByDesc('is_default')
+                ->get(['id', 'name', 'from_address', 'daily_limit']),
             'preview' => $campaign->editable() ? $campaigns->preview($campaign) : null,
             'messages' => OutboundMessage::query()
                 ->where('campaign_id', $campaign->id)
@@ -140,6 +156,51 @@ class CampaignController extends Controller
                 ->limit(100)
                 ->get(),
         ]);
+    }
+
+    public function update(Request $request, OutboundCampaign $campaign): RedirectResponse
+    {
+        abort_unless((int) $campaign->workspace_id === (int) $request->user()->workspace_id, 404);
+        abort_unless($campaign->editable(), 409, 'This campaign can no longer be edited.');
+
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:160'],
+            'email_verification_policy' => ['nullable', 'in:'.implode(',', array_column(EmailVerificationPolicy::cases(), 'value'))],
+            'saved_filter_id' => ['nullable', 'integer'],
+            'template_id' => ['nullable', 'integer'],
+            'mailbox_id' => ['nullable', 'integer'],
+            'subject' => ['nullable', 'string', 'max:180'],
+            'body' => ['required', 'string'],
+            'body_html' => ['nullable', 'string'],
+            'mode' => ['required', 'in:draft,scheduled'],
+            'scheduled_at' => ['nullable', 'date', 'required_if:mode,scheduled'],
+        ]);
+
+        $workspace = $request->user()->workspace;
+        $template = ! empty($data['template_id'])
+            ? OutboundTemplate::query()->forWorkspace($workspace)->find($data['template_id'])
+            : null;
+        $filter = ! empty($data['saved_filter_id'])
+            ? SavedFilter::query()->forWorkspace($workspace)->where('entity', 'contact')->find($data['saved_filter_id'])
+            : null;
+        $mailbox = ! empty($data['mailbox_id'])
+            ? Mailbox::query()->forWorkspace($workspace)->find($data['mailbox_id'])
+            : null;
+
+        $campaign->forceFill([
+            'name' => $data['name'],
+            'email_verification_policy' => $data['email_verification_policy'] ?? EmailVerificationPolicy::Strict->value,
+            'saved_filter_id' => $filter?->id,
+            'template_id' => $template?->id,
+            'mailbox_id' => $mailbox?->id,
+            'subject' => $data['subject'] ?? $template?->subject,
+            'body' => $data['body'],
+            'body_html' => $data['body_html'] ?? $template?->body_html,
+            'status' => $data['mode'] === 'scheduled' ? OutboundCampaign::STATUS_SCHEDULED : OutboundCampaign::STATUS_DRAFT,
+            'scheduled_at' => $data['mode'] === 'scheduled' ? $data['scheduled_at'] : null,
+        ])->save();
+
+        return back();
     }
 
     public function sendNow(Request $request, OutboundCampaign $campaign, CampaignService $campaigns): RedirectResponse

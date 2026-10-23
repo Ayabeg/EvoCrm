@@ -236,3 +236,16 @@ Run the final release audit after the remaining UI/source-contract checks are re
 ### Remaining
 
 - Live verification-provider semantics, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
+
+## 2026-10-23 — broadcast campaign editing
+
+### Completed / verified
+
+- Added workspace-scoped campaign editing for draft and scheduled broadcasts, including audience filter, template, mailbox, subject/body, verification policy, and schedule changes.
+- Foreign saved-filter, template, and mailbox IDs are ignored rather than attached across workspaces; campaigns that have started remain immutable and return a conflict response.
+- Added the edit form to the campaign detail surface and kept the explicit send-now activation path separate from saving changes.
+- Campaign feature coverage passes **8 tests / 108 assertions**; the broader outbound lifecycle set passes **64 tests / 383 assertions**. PHP formatting, TypeScript, targeted ESLint, production Vite build, and `git diff --check` pass.
+
+### Remaining
+
+- Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.

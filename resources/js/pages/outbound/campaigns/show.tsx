@@ -2,17 +2,37 @@ import { Form, router } from '@inertiajs/react';
 import { OutboundPage, OutboundShell } from '@/components/crm/outbound-shell';
 import { CampaignWorkspace } from '@/evo/outbound/CampaignWorkspace';
 import { Field, OutboundSection } from '@/evo/outbound/section';
-import type { CampaignDetail, OutboundMessageRow } from '@/evo/outbound/types';
+import type {
+    CampaignDetail,
+    OutboundMessageRow,
+    TemplateRow,
+} from '@/evo/outbound/types';
 import { Button } from '@/evo/ui/button';
 import { Input } from '@/evo/ui/input';
+import { NativeSelect } from '@/evo/ui/native-select';
+import { Textarea } from '@/evo/ui/textarea';
 import { t } from '@/lib/i18n';
+
+type FilterRow = { id: number; name: string };
+type MailboxRow = {
+    id: number;
+    name: string;
+    from_address: string;
+    daily_limit: number;
+};
 
 export default function CampaignShow({
     campaign,
     messages,
+    filters,
+    templates,
+    mailboxes,
 }: {
     campaign: CampaignDetail;
     messages: OutboundMessageRow[];
+    filters: FilterRow[];
+    templates: TemplateRow[];
+    mailboxes: MailboxRow[];
 }) {
     const editable = ['draft', 'scheduled'].includes(campaign.status);
 
@@ -108,6 +128,141 @@ export default function CampaignShow({
                                 ))}
                             </div>
                         ) : null}
+                    </OutboundSection>
+                ) : null}
+                {editable ? (
+                    <OutboundSection title={t('Edit campaign')}>
+                        <Form
+                            action={`/outbound/campaigns/${campaign.id}`}
+                            method="put"
+                            className="grid gap-3"
+                        >
+                            {({ processing }) => (
+                                <>
+                                    <div className="grid gap-3 md:grid-cols-3">
+                                        <Field label={t('Name')}>
+                                            <Input
+                                                name="name"
+                                                defaultValue={campaign.name}
+                                                required
+                                            />
+                                        </Field>
+                                        <Field label={t('Audience (CRM list)')}>
+                                            <NativeSelect
+                                                name="saved_filter_id"
+                                                defaultValue={campaign.saved_filter?.id ?? ''}
+                                            >
+                                                <option value="">
+                                                    {t('All contacts with email')}
+                                                </option>
+                                                {filters.map((filter) => (
+                                                    <option key={filter.id} value={filter.id}>
+                                                        {filter.name}
+                                                    </option>
+                                                ))}
+                                            </NativeSelect>
+                                        </Field>
+                                        <Field label={t('Mailbox')}>
+                                            <NativeSelect
+                                                name="mailbox_id"
+                                                defaultValue={campaign.mailbox?.id ?? ''}
+                                            >
+                                                <option value="">
+                                                    {t('Default enabled mailbox')}
+                                                </option>
+                                                {mailboxes.map((mailbox) => (
+                                                    <option key={mailbox.id} value={mailbox.id}>
+                                                        {mailbox.name} — {mailbox.from_address}
+                                                    </option>
+                                                ))}
+                                            </NativeSelect>
+                                        </Field>
+                                    </div>
+                                    <div className="grid gap-3 md:grid-cols-3">
+                                        <Field label={t('Template')}>
+                                            <NativeSelect
+                                                name="template_id"
+                                                defaultValue={campaign.template?.id ?? ''}
+                                            >
+                                                <option value="">{t('No template')}</option>
+                                                {templates.map((template) => (
+                                                    <option key={template.id} value={template.id}>
+                                                        {template.name}
+                                                    </option>
+                                                ))}
+                                            </NativeSelect>
+                                        </Field>
+                                        <Field label={t('Subject')} className="md:col-span-2">
+                                            <Input
+                                                name="subject"
+                                                defaultValue={campaign.subject ?? ''}
+                                            />
+                                        </Field>
+                                    </div>
+                                    <Field label={t('Uncertain email policy')}>
+                                        <NativeSelect
+                                            name="email_verification_policy"
+                                            defaultValue={campaign.email_verification_policy ?? 'strict'}
+                                        >
+                                            <option value="strict">
+                                                {t('Strict — block uncertain results')}
+                                            </option>
+                                            <option value="allow_catch_all">
+                                                {t('Allow catch-all if deployment permits')}
+                                            </option>
+                                            <option value="allow_unknown">
+                                                {t('Allow unknown if deployment permits')}
+                                            </option>
+                                            <option value="allow_uncertain">
+                                                {t('Allow uncertain results if deployment permits')}
+                                            </option>
+                                        </NativeSelect>
+                                    </Field>
+                                    <Field label={t('Body (text)')}>
+                                        <Textarea
+                                            name="body"
+                                            rows={5}
+                                            defaultValue={campaign.body}
+                                            required
+                                        />
+                                    </Field>
+                                    <Field label={t('Body (HTML, optional)')}>
+                                        <Textarea
+                                            name="body_html"
+                                            rows={4}
+                                            defaultValue={campaign.body_html ?? ''}
+                                        />
+                                    </Field>
+                                    <div className="grid gap-3 md:grid-cols-3">
+                                        <Field label={t('Campaign state')}>
+                                            <NativeSelect
+                                                name="mode"
+                                                defaultValue={
+                                                    campaign.status === 'scheduled'
+                                                        ? 'scheduled'
+                                                        : 'draft'
+                                                }
+                                            >
+                                                <option value="draft">{t('Save as draft')}</option>
+                                                <option value="scheduled">{t('Schedule')}</option>
+                                            </NativeSelect>
+                                        </Field>
+                                        <Field label={t('Scheduled at')}>
+                                            <Input
+                                                name="scheduled_at"
+                                                type="datetime-local"
+                                                defaultValue={campaign.scheduled_at?.slice(0, 16) ?? ''}
+                                            />
+                                        </Field>
+                                        <div className="flex items-end">
+                                            <Button disabled={processing} variant="outline">
+                                                {t('Save changes')}
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+                        </Form>
                     </OutboundSection>
                 ) : null}
             </OutboundPage>

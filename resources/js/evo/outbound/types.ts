@@ -48,6 +48,7 @@ export type CampaignRow = {
 
 export type CampaignDetail = CampaignRow & {
     body: string;
+    body_html?: string | null;
     started_at?: string | null;
     preview?: CampaignPreview | null;
 };
