@@ -18,7 +18,7 @@
 - Reused the shared workflow redaction contract for terminal `ExpandOutboundCampaign` failures, so 50k-scale cursor workers no longer persist recipient addresses, provider URLs, or authorization tokens in `expansion_error`.
 - Added a regression covering the terminal failure callback and the existing bounded 250-contact expansion path.
 - The focused outbound expansion/redaction gate passes **28 tests / 185 assertions**; Pint, PHP syntax, and `git diff --check` pass.
-- The connected acquisition/inbound/enrichment/outbound/funnel/scoring gate passes **114 tests / 807 assertions**; `npm run types:check` and targeted Pint pass.
+- The connected acquisition/inbound/enrichment/outbound/funnel/scoring gate passes **115 tests / 808 assertions**; `npm run types:check` and targeted Pint pass.
 
 ### Remaining
 
