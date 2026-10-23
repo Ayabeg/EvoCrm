@@ -218,6 +218,35 @@ it('uses the workspace timezone for campaign daily-cap rollover', function () {
         ->and($campaign->refresh()->status)->toBe(OutboundCampaign::STATUS_SENT);
 });
 
+it('keeps campaign caps isolated when multiple workspace timezones run together', function () {
+    $this->travelTo(Carbon::parse('2026-08-23 18:00:00', 'Africa/Algiers'));
+
+    $firstUser = User::factory()->create();
+    $secondUser = User::factory()->create();
+    $secondUser->workspace->update(['timezone' => 'America/New_York']);
+    QuietHours::query()->whereIn('workspace_id', [$firstUser->workspace_id, $secondUser->workspace_id])->update(['enabled' => false]);
+    enabledMailbox($firstUser, ['daily_limit' => 50]);
+    enabledMailbox($secondUser, ['daily_limit' => 50]);
+
+    $firstContacts = Contact::factory()->withVerifiedEmail()->count(2)->create(['workspace_id' => $firstUser->workspace_id]);
+    $secondContacts = Contact::factory()->withVerifiedEmail()->count(2)->create(['workspace_id' => $secondUser->workspace_id]);
+    $firstCampaign = OutboundCampaign::factory()->create(['workspace_id' => $firstUser->workspace_id, 'daily_limit' => 1]);
+    $secondCampaign = OutboundCampaign::factory()->create(['workspace_id' => $secondUser->workspace_id, 'daily_limit' => 1]);
+
+    app(CampaignService::class)->expand($firstCampaign);
+    app(CampaignService::class)->expand($secondCampaign);
+    $this->artisan('outbound:run')->assertSuccessful();
+
+    $this->travelTo(Carbon::parse('2026-08-24 03:30:00', 'Africa/Algiers'));
+    $this->artisan('outbound:run')->assertSuccessful();
+
+    expect(OutboundMessage::query()->where('campaign_id', $firstCampaign->id)->where('status', 'sent')->count())->toBe(2)
+        ->and(OutboundMessage::query()->where('campaign_id', $secondCampaign->id)->where('status', 'sent')->count())->toBe(1)
+        ->and(OutboundMessage::query()->where('campaign_id', $secondCampaign->id)->where('defer_reason', 'campaign_daily_cap')->count())->toBe(1)
+        ->and($firstContacts)->toHaveCount(2)
+        ->and($secondContacts)->toHaveCount(2);
+});
+
 it('fails a campaign message honestly when the contact is suppressed after expansion', function () {
     $this->travelTo(Carbon::parse('2026-08-23 10:00:00', 'Africa/Algiers'));
 

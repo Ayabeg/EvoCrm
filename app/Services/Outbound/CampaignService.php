@@ -352,19 +352,36 @@ class CampaignService
             ->get();
 
         $totals = ['sent' => 0, 'deferred' => 0, 'failed' => 0];
-        $campaignIds = $messages->pluck('campaign_id')->filter()->unique()->values();
-        $sentTodayByCampaign = $campaignIds->isEmpty()
-            ? collect()
-            : OutboundMessage::query()
+        $sentTodayByCampaign = collect();
+
+        foreach ($messages->groupBy('workspace_id') as $workspaceMessages) {
+            $workspace = $workspaceMessages->first()?->workspace;
+
+            if (! $workspace) {
+                continue;
+            }
+
+            $campaignIds = $workspaceMessages->pluck('campaign_id')->filter()->unique()->values();
+
+            if ($campaignIds->isEmpty()) {
+                continue;
+            }
+
+            $dayStart = $this->workspaceDayStart($workspace);
+            $counts = OutboundMessage::query()
                 ->whereIn('campaign_id', $campaignIds)
                 ->where('direction', 'out')
                 ->where('status', 'sent')
-                ->where('sent_at', '>=', $this->workspaceDayStart($messages->first()->workspace))
-                ->where('sent_at', '<', $this->workspaceDayStart($messages->first()->workspace)->copy()->addDay())
+                ->where('sent_at', '>=', $dayStart)
+                ->where('sent_at', '<', $dayStart->copy()->addDay())
                 ->selectRaw('campaign_id, COUNT(*) as aggregate')
                 ->groupBy('campaign_id')
-                ->pluck('aggregate', 'campaign_id')
-                ->map(fn ($count): int => (int) $count);
+                ->pluck('aggregate', 'campaign_id');
+
+            foreach ($counts as $campaignId => $count) {
+                $sentTodayByCampaign[$campaignId] = (int) $count;
+            }
+        }
 
         foreach ($messages as $message) {
             $campaign = $message->campaign;
