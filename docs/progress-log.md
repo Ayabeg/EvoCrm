@@ -250,6 +250,18 @@ Run the final release audit after the remaining UI/source-contract checks are re
 
 - Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
 
+## 2026-10-23 — signed lead-magnet booking attribution
+
+### Completed / verified
+
+- Replaced unsigned sequential lead-magnet submission attribution with signed booking capabilities. The calculator returns a signed meeting URL, the booking form preserves it through POST, and unsigned IDs are ignored.
+- Restricted the legacy lead-magnet demo redirect to signed requests and the active calculator offer in the same workspace.
+- The public calculator, meeting, and inbound workflow regression passes **20 tests / 195 assertions**; Pint, targeted ESLint, TypeScript, and `git diff --check` pass.
+
+### Remaining
+
+- Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
+
 ## 2026-10-23 — workspace-timezone campaign cap
 
 ### Completed / verified

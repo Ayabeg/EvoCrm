@@ -1,6 +1,6 @@
 # Acquisition systems release report
 
-Current implementation revision: `3d7798b2` (`main`; this release report is maintained in subsequent documentation commits)
+Current implementation revision: `58e83570` (`main`; this release report is maintained in subsequent documentation commits)
 
 This report records the current verified state of Dead Enrichment, EvoCRM Outbound, and Dead Magnet. It is a release-readiness report, not a claim that live providers or the unrelated repository UI contracts are production-ready.
 
@@ -22,6 +22,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Dead Magnet Lead Leakage Calculator, validation, duplicate-safe submission persistence, separate delivery/marketing/enrichment consent, shared CRM handoff, queued result delivery with honest failure states, demo handoff, booking attribution, and persisted form-start, calculator-use, submission, demo-request, and booking funnel analytics.
 - Public analytics consent gating and pseudonymous authenticated analytics identity.
 - Database-backed idempotency for subject-scoped funnel events, with atomic recorder behavior and append-only subjectless visit tracking.
+- Lead-magnet-to-meeting attribution uses signed booking capabilities; unsigned sequential submission IDs are ignored and ordinary public booking remains available without attribution.
 - External repository audit completed: the three Ayabeg repositories are public but empty (size `0`, no remote heads), so there was no implementation to import; the non-empty 50k lead-generation repository was used as a reference for workflow boundaries only.
 
 ## Verification evidence
@@ -47,6 +48,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Per-campaign daily-cap regression: **70 tests / 402 assertions passed** across campaign expansion, rollover, editing, and outbound lifecycle; Pint, targeted ESLint, TypeScript, `git diff --check`, and the production Vite build passed. The build retains only the repository's existing optional-font, chunk-size, and dynamic-import warnings.
 - Workspace-timezone campaign-cap regression: **24 tests / 164 assertions passed** for the outbound department; the broader outbound gate passed **72 tests / 411 assertions** with Pint and `git diff --check`.
 - Multi-workspace cap-isolation regression: **25 tests / 171 assertions passed** for the outbound department; the focused campaign/outbound slice passed **57 tests / 357 assertions** with Pint and `git diff --check`.
+- Signed lead-magnet booking regression: **20 tests / 195 assertions passed** across public calculator, meeting, and inbound workflow paths; Pint, targeted ESLint, TypeScript, and `git diff --check` passed.
 - Partial-provider enrichment regression: **14 tests / 113 assertions passed** for enrichment, including a transient website failure with a retained Google Places result; the broader acquisition slice passed **39 tests / 284 assertions** and Pint passed.
 - Address-bound verification regression: **19 tests / 127 assertions passed** across enrichment and outbound policy, covering stale-address mismatch and preservation of stronger evidence; Pint and `git diff --check` passed.
 - Security review `adf68552-9b4c-4de9-a9df-5c42735668c6` for the conservative verification-policy change from `3d578579` through `d1738420`: complete coverage of the changed eligibility configuration and zero reportable findings.
@@ -77,6 +79,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - `5438a835` — kept explicit invalid verification results fail-closed.
 - `0e3b0660` — applied workspace timezones to campaign daily-cap counting and rollover.
 - `3d7798b2` — isolated campaign daily-cap counts by workspace in shared runner passes.
+- `58e83570` — signed lead-magnet booking attribution through the public meeting form.
 
 ## Implemented but not fully verified
 

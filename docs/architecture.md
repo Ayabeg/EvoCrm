@@ -63,7 +63,7 @@ Keep calculator math as a pure domain service with no HTTP or Eloquent dependenc
 
 The lead-magnet result-copy job is unique per submission, retryable, and records queued, sending, accepted, or failed state plus the last error. Accepted means the configured mailer accepted the message; it is not proof of inbox delivery. Anonymous calculator use remains inline and does not create a contact.
 
-When a workspace has an enabled MeetingSchedule, the calculator result links to a throttled, workspace-scoped demo redirect. The redirect records a deduplicated demo-requested funnel event for the submission and then hands off to the existing public booking flow; no booking link is invented when no schedule is configured.
+When a workspace has an enabled MeetingSchedule, the calculator result links to a throttled, workspace-scoped demo redirect. The redirect records a deduplicated demo-requested funnel event for the submission and then hands off to the existing public booking flow. Calculator results emit a signed booking capability, and the booking controller ignores unsigned submission IDs so sequential record IDs cannot attach another submission to a booking; no booking link is invented when no schedule is configured.
 
 The public form has separate marketing and enrichment consent flags. Enrichment is queued only for a linked contact when the visitor explicitly permits relevant public-business enrichment; anonymous use and marketing-only consent never trigger enrichment.
 
