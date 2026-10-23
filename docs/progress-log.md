@@ -261,6 +261,17 @@ Run the final release audit after the remaining UI/source-contract checks are re
 
 - Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
 
+## 2026-10-23 — multi-workspace campaign-cap isolation
+
+### Completed / verified
+
+- Grouped campaign-cap counts by workspace in the shared outbound runner. Each tenant now uses its own local-day boundary even when a single run processes messages from multiple workspaces.
+- Added a two-workspace timezone regression. The outbound department set passes **25 tests / 171 assertions**; the focused campaign/outbound slice passes **57 tests / 357 assertions**; Pint and `git diff --check` pass.
+
+### Remaining
+
+- Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
+
 ## 2026-10-23 — address-bound verification provenance
 
 ### Completed / verified
