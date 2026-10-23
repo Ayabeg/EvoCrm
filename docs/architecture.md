@@ -63,7 +63,7 @@ Email verification provenance is projected from an `EnrichmentRun` onto the rela
 
 Marketing consent is required by default for outbound eligibility, and an explicit denial always suppresses that channel. The opt-out for consentless cold outreach is an explicit deployment configuration that requires a documented lawful basis and legal review; lead-magnet delivery remains separate from optional marketing consent and never auto-enrolls a submission into cold outreach.
 
-Outbound reporting exposes a typed evidence-aware metric contract rather than placeholder rates. It reports campaign audience snapshots, messages leaving the queue, mailer-accepted sends, provider delivery/bounce/complaint events, reply sync and classification, suppression matches, and CRM outcomes. Every rate carries its denominator; contact-attributed CRM outcomes intentionally have no conversion rate until a stronger attribution key exists. Opens and clicks are first-party tracking events with explicit caveats and are never treated as proof of interest.
+Outbound reporting exposes a typed evidence-aware metric contract rather than placeholder rates. It reports campaign audience snapshots, messages leaving the queue, mailer-accepted sends, provider delivery/bounce/complaint events, reply sync and classification, suppression matches, demo requests/bookings, and CRM outcomes. Every rate carries its denominator; contact-attributed funnel and CRM outcomes intentionally have no conversion rate until a stronger attribution key exists. Opens and clicks are first-party tracking events with explicit caveats and are never treated as proof of interest.
 
 ### Dead Magnet
 

@@ -5,9 +5,10 @@
 ### Completed / verified
 
 - Replaced the outbound report's empty tracking placeholders with typed metrics for campaign selection, attempted messages, mailer acceptance, provider delivery, bounces, complaints, replies, positive replies, opens, clicks, suppression matches, CRM outcomes, and campaign errors.
+- Added contact-attributed demo-requested and meeting-booked funnel metrics to the same report contract; both remain count-only until a stronger campaign attribution key exists.
 - Each rate now carries an explicit denominator. Metrics identify whether their evidence is an actual provider/CRM event, an inferred local state, or a campaign snapshot; contact-attributed CRM outcomes do not expose a misleading conversion rate.
 - Added the report UI metric panel with evidence quality, count, denominator/rate, definition, and caveat text. Opens are explicitly labeled as unreliable proof of interest.
-- The outbound report suite passes **9 tests / 134 assertions**; targeted Pint and `npm run types:check` pass; `git diff --check` passes.
+- The outbound report suite passes **9 tests / 138 assertions**; targeted Pint and `npm run types:check` pass; `git diff --check` passes.
 - The full PHP regression after this increment is **1,364 tests; 1,355 passed; 8 existing branding/design-system/automation contract failures; 35,878 assertions; 1 skipped**. No acquisition-system test failed; the two existing `InvalidArgumentException` import warnings remain unchanged.
 
 ### Remaining

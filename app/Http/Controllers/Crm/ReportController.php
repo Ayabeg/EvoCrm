@@ -9,6 +9,7 @@ use App\Models\AdCampaignStat;
 use App\Models\AdLead;
 use App\Models\Dashboard;
 use App\Models\Deal;
+use App\Models\FunnelEvent;
 use App\Models\Lead;
 use App\Models\Message;
 use App\Models\OutboundCampaign;
@@ -737,6 +738,24 @@ class ReportController extends Controller
                 ->select('contact_id')
                 ->distinct()
                 ->count();
+        $demoRequests = $campaignContactIds->isEmpty()
+            ? 0
+            : FunnelEvent::query()
+                ->forWorkspace($workspace)
+                ->where('event_type', FunnelEvent::TYPE_DEMO_REQUESTED)
+                ->whereIn('contact_id', $campaignContactIds)
+                ->select('contact_id')
+                ->distinct()
+                ->count();
+        $demosBooked = $campaignContactIds->isEmpty()
+            ? 0
+            : FunnelEvent::query()
+                ->forWorkspace($workspace)
+                ->where('event_type', FunnelEvent::TYPE_MEETING_BOOKED)
+                ->whereIn('contact_id', $campaignContactIds)
+                ->select('contact_id')
+                ->distinct()
+                ->count();
         $recipientAddresses = (clone $out)->pluck('to_address')->filter()->unique()->values();
         $optedOut = $recipientAddresses->isEmpty()
             ? 0
@@ -766,6 +785,8 @@ class ReportController extends Controller
             'opened' => $metric($totals['opened'], $totals['sent'], 'actual', 'first_party_tracking', 'Accepted outbound messages with at least one tracking-pixel event.', 'Opens are not reliable proof of interest.'),
             'clicked' => $metric($totals['clicked'], $totals['sent'], 'actual', 'first_party_tracking', 'Accepted outbound messages with at least one tracked-link event.', 'Clicks indicate a tracked interaction, not qualification.'),
             'qualified_opportunities' => $metric($openOpportunities, null, 'inferred', 'crm_pipeline', 'Open CRM deals for contacts reached by a campaign.', 'This is contact-attributed CRM state, not proof that the campaign created the opportunity; no conversion rate is shown.'),
+            'demo_requests' => $metric($demoRequests, null, 'inferred', 'funnel_event', 'Distinct reached contacts with a recorded demo-requested funnel event.', 'Campaign attribution is contact-based; no conversion rate is shown.'),
+            'demos_booked' => $metric($demosBooked, null, 'inferred', 'funnel_event', 'Distinct reached contacts with a recorded meeting-booked funnel event.', 'Campaign attribution is contact-based; no conversion rate is shown.'),
             'customers_won' => $metric($wonCustomers, null, 'inferred', 'crm_pipeline', 'Distinct contacts reached by a campaign with at least one won deal.', 'Campaign attribution is contact-based; no conversion rate is shown.'),
             'opted_out' => $metric($optedOut, $totals['sent'], 'actual', 'suppression_list', 'Unique recipient addresses currently present in the workspace email suppression list.'),
             'campaign_errors' => $metric($totals['failed'], $attempted, 'actual', 'outbound_message_state', 'Outbound messages in a failed state after leaving the queue.'),

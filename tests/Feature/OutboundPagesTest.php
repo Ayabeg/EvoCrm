@@ -2,6 +2,7 @@
 
 use App\Models\Contact;
 use App\Models\Deal;
+use App\Models\FunnelEvent;
 use App\Models\Mailbox;
 use App\Models\OutboundCampaign;
 use App\Models\OutboundMessage;
@@ -96,12 +97,28 @@ it('reports explicit outbound denominators and CRM outcomes', function () {
         'delivered_at' => now(),
         'replied_at' => now(),
     ]);
+    FunnelEvent::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'event_type' => FunnelEvent::TYPE_DEMO_REQUESTED,
+        'contact_id' => $contact->id,
+        'source' => 'outbound',
+        'occurred_at' => now(),
+    ]);
+    FunnelEvent::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'event_type' => FunnelEvent::TYPE_MEETING_BOOKED,
+        'contact_id' => $contact->id,
+        'source' => 'outbound',
+        'occurred_at' => now(),
+    ]);
 
     $this->actingAs($user)->get('/reports/outbound')->assertInertia(fn ($page) => $page
         ->where('outboundDetail.tracking.selected.count', 2)
         ->where('outboundDetail.tracking.sent.denominator', 1)
         ->where('outboundDetail.tracking.delivered.rate', 100)
         ->where('outboundDetail.tracking.qualified_opportunities.denominator', null)
+        ->where('outboundDetail.tracking.demo_requests.count', 1)
+        ->where('outboundDetail.tracking.demos_booked.count', 1)
         ->where('outboundDetail.tracking.customers_won.source', 'crm_pipeline')
     );
 });

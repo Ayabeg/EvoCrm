@@ -27,7 +27,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Database-backed idempotency for subject-scoped funnel events, with atomic recorder behavior and append-only subjectless visit tracking.
 - Lead-magnet-to-meeting attribution uses signed booking capabilities; unsigned sequential submission IDs are ignored and ordinary public booking remains available without attribution.
 - External repository audit completed: the three Ayabeg repositories are public but empty (size `0`, no remote heads), so there was no implementation to import; the non-empty 50k lead-generation repository was used as a reference for workflow boundaries only.
-- Outbound reporting now exposes evidence-aware counts and rates for selection, attempts, mailer acceptance, provider delivery/bounce/complaint events, replies, positive replies, suppression, CRM outcomes, and campaign errors. Every emitted rate includes its denominator; opens/clicks carry explicit caveats and are not treated as interest proof.
+- Outbound reporting now exposes evidence-aware counts and rates for selection, attempts, mailer acceptance, provider delivery/bounce/complaint events, replies, positive replies, demo requests/bookings, suppression, CRM outcomes, and campaign errors. Every emitted rate includes its denominator; opens/clicks carry explicit caveats and are not treated as interest proof.
 - Lead scoring rule points are now configurable per workspace for fit, intent, timing, and data quality, with bounded defaults, fallback for omitted values, and persisted explainable score breakdowns.
 
 ## Verification evidence
@@ -57,7 +57,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Email-verification provider/cache regression: **17 tests / 123 assertions passed**; the cross-system enrichment/outbound slice passed **68 tests / 394 assertions** with Pint. The disabled provider records an explanatory unsupported result, while an injected provider is cached per current address.
 - HTTP verifier/retry regression: **3 tests / 18 assertions passed**; the broader provider/enrichment/outbound slice passed **71 tests / 412 assertions** with Pint and `git diff --check`.
 - Robots/enrichment regression: **7 tests / 27 assertions passed**; the combined website/provider/acquisition slice passed **78 tests / 439 assertions** with Pint.
-- Outbound report regression: **9 tests / 134 assertions passed**; targeted Pint, TypeScript, and `git diff --check` passed.
+- Outbound report regression: **9 tests / 138 assertions passed**; targeted Pint, TypeScript, and `git diff --check` passed.
 - Lead-scoring regression: **13 tests / 80 assertions passed**; targeted Pint and TypeScript passed.
 - Full PHP regression after robots enforcement: **1,363 tests; 1,354 passed; 8 existing branding/design-system/automation contract failures; 35,852 assertions; 1 skipped**. No acquisition test failed.
 - Full PHP regression after evidence-aware outbound reporting: **1,364 tests; 1,355 passed; 8 existing branding/design-system/automation contract failures; 35,878 assertions; 1 skipped**. No acquisition/report test failed; the two existing `InvalidArgumentException` import warnings remain unchanged.
