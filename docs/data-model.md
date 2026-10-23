@@ -62,6 +62,7 @@ Use the existing suppression tables and consent records as the enforcement sourc
 - Subject-scoped `funnel_events` are database-idempotent on workspace, funnel, event type, subject type, and subject ID; subjectless visit beacons intentionally remain append-only.
 - Inbound IMAP replies retain the provider `message_id` (or a mailbox/UID fallback) and use a workspace/mailbox/direction/message identity constraint so repeated polls and concurrent workers cannot create duplicate reply records.
 - Outbound messages use `sending_at` with a status/send-claim index. A stale claim is quarantined as `failed` with an unknown-provider-outcome reason after the bounded recovery window; a fresh claim prevents concurrent sequence or campaign workers from sending the same message twice.
+- Broadcast campaigns store `daily_limit` (default 20) separately from the selected mailbox limit. The campaign runner records `campaign_daily_cap` as a deferred state instead of failing or dropping messages when the per-campaign limit is reached.
 - Evidence lookup is indexed by workspace, target, field, status, and recency.
 - List screens filter and paginate by workspace; no unbounded public or operator query is allowed.
 - Domain/email/phone normalization is deterministic and stored separately from display values when needed.

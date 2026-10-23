@@ -218,6 +218,16 @@ export default function CampaignShow({
                                             </option>
                                         </NativeSelect>
                                     </Field>
+                                    <Field label={t('Campaign daily limit')}>
+                                        <Input
+                                            name="daily_limit"
+                                            type="number"
+                                            min={1}
+                                            max={1000}
+                                            defaultValue={campaign.daily_limit}
+                                            required
+                                        />
+                                    </Field>
                                     <Field label={t('Body (text)')}>
                                         <Textarea
                                             name="body"

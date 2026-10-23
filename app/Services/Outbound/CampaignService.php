@@ -351,6 +351,18 @@ class CampaignService
             ->get();
 
         $totals = ['sent' => 0, 'deferred' => 0, 'failed' => 0];
+        $campaignIds = $messages->pluck('campaign_id')->filter()->unique()->values();
+        $sentTodayByCampaign = $campaignIds->isEmpty()
+            ? collect()
+            : OutboundMessage::query()
+                ->whereIn('campaign_id', $campaignIds)
+                ->where('direction', 'out')
+                ->where('status', 'sent')
+                ->whereDate('sent_at', now()->toDateString())
+                ->selectRaw('campaign_id, COUNT(*) as aggregate')
+                ->groupBy('campaign_id')
+                ->pluck('aggregate', 'campaign_id')
+                ->map(fn ($count): int => (int) $count);
 
         foreach ($messages as $message) {
             $campaign = $message->campaign;
@@ -392,6 +404,17 @@ class CampaignService
                 continue;
             }
 
+            $campaignDailyLimit = (int) ($campaign->daily_limit ?? 20);
+            if ($campaignDailyLimit > 0 && (int) ($sentTodayByCampaign[$campaign->id] ?? 0) >= $campaignDailyLimit) {
+                $message->forceFill([
+                    'deferred_until' => now()->addDay()->startOfDay(),
+                    'defer_reason' => 'campaign_daily_cap',
+                ])->save();
+                $totals['deferred']++;
+
+                continue;
+            }
+
             $mailbox = $message->mailbox_id
                 ? Mailbox::query()->forWorkspace($workspace)->where('enabled', true)->find($message->mailbox_id)
                 : null;
@@ -427,6 +450,7 @@ class CampaignService
             $totals[$sent->status === 'sent' ? 'sent' : 'failed']++;
 
             if ($sent->status === 'sent') {
+                $sentTodayByCampaign[$campaign->id] = (int) ($sentTodayByCampaign[$campaign->id] ?? 0) + 1;
                 $this->analytics->capture(ProductAnalytics::EMAIL_SENT, [
                     'message_id' => $sent->id,
                     'channel' => $sent->channel,

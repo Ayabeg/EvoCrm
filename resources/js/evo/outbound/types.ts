@@ -35,6 +35,7 @@ export type CampaignRow = {
     status: string;
     email_verification_policy?: string;
     subject?: string | null;
+    daily_limit: number;
     scheduled_at?: string | null;
     sent_at?: string | null;
     audience_count: number;

@@ -153,6 +153,36 @@ it('defers campaign messages when the mailbox hits its daily cap', function () {
     expect($deferred->defer_reason)->toBe('daily_cap');
 });
 
+it('defers campaign messages at the campaign daily cap and resumes next day', function () {
+    $this->travelTo(Carbon::parse('2026-08-23 10:00:00', 'Africa/Algiers'));
+
+    $user = User::factory()->create();
+    enabledMailbox($user, ['daily_limit' => 50]);
+    Contact::factory()->withVerifiedEmail()->count(2)->create(['workspace_id' => $user->workspace_id]);
+
+    $campaign = OutboundCampaign::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'daily_limit' => 1,
+    ]);
+    app(CampaignService::class)->expand($campaign);
+
+    $this->artisan('outbound:run')->assertSuccessful();
+
+    $messages = OutboundMessage::query()->where('campaign_id', $campaign->id)->get();
+    expect($messages->where('status', 'sent'))->toHaveCount(1);
+
+    $deferred = $messages->firstWhere('status', 'queued');
+    expect($deferred)->not->toBeNull()
+        ->and($deferred->defer_reason)->toBe('campaign_daily_cap')
+        ->and($deferred->deferred_until->toDateString())->toBe('2026-08-24');
+
+    $this->travelTo(Carbon::parse('2026-08-24 10:00:00', 'Africa/Algiers'));
+    $this->artisan('outbound:run')->assertSuccessful();
+
+    expect($deferred->refresh()->status)->toBe('sent')
+        ->and($campaign->refresh()->status)->toBe(OutboundCampaign::STATUS_SENT);
+});
+
 it('fails a campaign message honestly when the contact is suppressed after expansion', function () {
     $this->travelTo(Carbon::parse('2026-08-23 10:00:00', 'Africa/Algiers'));
 

@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'saved_filter_id',
     'template_id',
     'mailbox_id',
+    'daily_limit',
     'subject',
     'body',
     'body_html',
@@ -60,6 +61,7 @@ class OutboundCampaign extends Model
             'sent_at' => 'datetime',
             'audience_count' => 'integer',
             'suppressed_count' => 'integer',
+            'daily_limit' => 'integer',
             'expansion_cursor' => 'integer',
         ];
     }

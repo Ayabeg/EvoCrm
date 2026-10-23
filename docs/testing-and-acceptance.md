@@ -21,7 +21,7 @@ No feature in the requested three-system expansion is marked complete merely bec
 - Enrichment provider success, partial result, stale result, conflict, timeout, retry, and permanent failure.
 - Workspace authorization, pagination, filtering, and duplicate review.
 - Workspace-scoped bulk enrichment queueing, cross-workspace ID rejection, unique job keys, and retry configuration.
-- Campaign creation/editing, activation, preview/test send, last-mile suppression check, daily limit, quiet hours, and duplicate send prevention.
+- Campaign creation/editing, activation, preview/test send, last-mile suppression check, mailbox and per-campaign daily limits, quiet hours, and duplicate send prevention.
 - Provider event idempotency, delivery projection, bounce/complaint/unsubscribe handling, complaint suppression, sequence pause, idempotent IMAP reply ingestion, reply pause, database send claims, stale-claim recovery, and restart-safe follow-up scheduling.
 - Subject-scoped funnel event idempotency is enforced by a database uniqueness constraint and exercised through duplicate recorder calls; subjectless public visits remain append-only.
 - Lead-magnet submission persistence, duplicate request handling, separate delivery/marketing consent, contact/lead matching, delivery error state, and demo-request conversion.

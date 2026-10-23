@@ -109,6 +109,16 @@ export default function CampaignsIndex({
                                         <option value="allow_uncertain">{t('Allow uncertain results if deployment permits')}</option>
                                     </NativeSelect>
                                 </Field>
+                                <Field label={t('Campaign daily limit')}>
+                                    <Input
+                                        name="daily_limit"
+                                        type="number"
+                                        min={1}
+                                        max={1000}
+                                        defaultValue={20}
+                                        required
+                                    />
+                                </Field>
                                 <Field label={t('Body (text) — {{first_name}} {{company}} {{unsub}}')}>
                                     <Textarea
                                         name="body"

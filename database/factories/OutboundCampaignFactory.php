@@ -17,6 +17,7 @@ class OutboundCampaignFactory extends Factory
             'workspace_id' => Workspace::factory(),
             'name' => 'Newsletter — '.fake()->words(2, true),
             'status' => OutboundCampaign::STATUS_DRAFT,
+            'daily_limit' => 20,
             'subject' => 'Hello {{first_name}}',
             'body' => 'Bonjour {{first_name}}, news from Evotechly.',
         ];

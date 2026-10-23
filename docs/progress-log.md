@@ -249,3 +249,16 @@ Run the final release audit after the remaining UI/source-contract checks are re
 ### Remaining
 
 - Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
+
+## 2026-10-23 — per-campaign outbound daily cap
+
+### Completed / verified
+
+- Added a workspace-scoped `daily_limit` to broadcast campaigns with a default of 20 messages per day, independent of the selected mailbox cap.
+- The campaign runner counts provider-accepted sends for the current day, defers excess queued messages with `campaign_daily_cap`, and resumes them after the next workspace day without dropping or failing them.
+- Added the limit to campaign create/edit surfaces, the design-lab fixture, the data model, and the operating documentation.
+- The outbound regression set passes **70 tests / 402 assertions**; Pint, targeted ESLint, TypeScript, and `git diff --check` pass.
+
+### Remaining
+
+- Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.

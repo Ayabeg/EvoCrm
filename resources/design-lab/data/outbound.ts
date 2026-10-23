@@ -99,6 +99,7 @@ export function getOutboundLabFixtures() {
         name: `Newsletter ${company.name}`,
         status: 'sending',
         subject: `Solution CRM — ${quote}`,
+        daily_limit: 20,
         audience_count: 48,
         suppressed_count: 2,
         body: `Bonjour {{first_name}}, proposition ${quote} pour ${company.name}.`,
