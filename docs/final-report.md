@@ -1,6 +1,6 @@
 # Acquisition systems release report
 
-Current implementation revision: `58e83570` (`main`; this release report is maintained in subsequent documentation commits)
+Current implementation revision: `ed59f1b5` (`main`; this release report is maintained in subsequent documentation commits)
 
 This report records the current verified state of Dead Enrichment, EvoCRM Outbound, and Dead Magnet. It is a release-readiness report, not a claim that live providers or the unrelated repository UI contracts are production-ready.
 
@@ -83,7 +83,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - `0e3b0660` — applied workspace timezones to campaign daily-cap counting and rollover.
 - `3d7798b2` — isolated campaign daily-cap counts by workspace in shared runner passes.
 - `58e83570` — signed lead-magnet booking attribution through the public meeting form.
-- Working-tree increment — modular email-verification provider contract, disabled fallback, optional DNS evidence, and cache coverage; commit pending after final checks.
+- `ed59f1b5` — modular email-verification provider contract, disabled fallback, optional DNS evidence, and cache coverage.
 
 ## Implemented but not fully verified
 
