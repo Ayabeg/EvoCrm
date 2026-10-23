@@ -1,6 +1,6 @@
 # Acquisition systems release report
 
-Current implementation revision: `b15b3d6d` (`main`; this release report is maintained in subsequent documentation commits)
+Current implementation revision: `67b24b2c` (`main`; this release report is maintained in subsequent documentation commits)
 
 This report records the current verified state of Dead Enrichment, EvoCRM Outbound, and Dead Magnet. It is a release-readiness report, not a claim that live providers or the unrelated repository UI contracts are production-ready.
 
@@ -63,7 +63,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - `7010768d` — recorded the external repository audit.
 - `207b3d7e` — blocked outbound prospects without a verification record and isolated the authenticated mailbox test-send exception.
 - `b15b3d6d` — added workspace-scoped editing for draft and scheduled outbound campaigns.
-- Current working increment — added configurable per-campaign daily caps with durable rollover deferral.
+- `67b24b2c` — added configurable per-campaign daily caps with durable rollover deferral.
 
 ## Implemented but not fully verified
 
