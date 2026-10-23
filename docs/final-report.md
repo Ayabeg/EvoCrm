@@ -1,6 +1,6 @@
 # Acquisition systems release report
 
-Current implementation revision: `89b946b5` (`main`; release report is maintained in subsequent documentation commits)
+Current implementation revision: `87585337` (`main`; release report is maintained in subsequent documentation commits)
 
 This report records the current verified state of Dead Enrichment, EvoCRM Outbound, and Dead Magnet. It is a release-readiness report, not a claim that live providers or the unrelated repository UI contracts are production-ready.
 
@@ -104,6 +104,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - `dea586da` — robots-aware public website enrichment with redirect-hop enforcement.
 - `cd4ac573` — validated configurable score-rule pillar shapes and recorded the follow-up security evidence.
 - `89b946b5` — aligned outbound detail metrics and campaign/sequence rows with the selected report window.
+- `87585337` — applied the selected contact-owner filter to outbound detail reporting.
 
 ## Implemented but not fully verified
 
