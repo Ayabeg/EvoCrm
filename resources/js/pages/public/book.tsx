@@ -23,6 +23,7 @@ export default function PublicBook({
     schedule,
     days,
     lead_magnet_submission_id,
+    lead_magnet_booking_url,
     deal_id,
 }: {
     host: { name: string | null };
@@ -36,6 +37,7 @@ export default function PublicBook({
     };
     days: Day[];
     lead_magnet_submission_id: number | null;
+    lead_magnet_booking_url: string | null;
     deal_id: number | null;
 }) {
     const [picked, setPicked] = useState<Slot | null>(null);
@@ -109,7 +111,7 @@ export default function PublicBook({
 
                 {picked ? (
                     <Form
-                        action={`/book/${schedule.slug}`}
+                        action={lead_magnet_booking_url ?? `/book/${schedule.slug}`}
                         method="post"
                         className="space-y-3 border-t border-hairline pt-4"
                     >

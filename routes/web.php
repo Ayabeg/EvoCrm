@@ -120,7 +120,7 @@ Route::get('/lead-magnet/{workspace:slug}/{offer}/track', [LeadLeakageController
     ->middleware('throttle:120,1')
     ->name('lead-magnet.track');
 Route::get('/lead-magnet/{workspace:slug}/demo', [LeadLeakageController::class, 'demo'])
-    ->middleware('throttle:30,1')
+    ->middleware(['signed', 'throttle:30,1'])
     ->name('lead-magnet.demo');
 
 Route::get('/unsubscribe', [UnsubscribeController::class, 'show'])

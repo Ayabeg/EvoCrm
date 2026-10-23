@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Services\Funnels\ConversionFunnelQuery;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 
 it('records one lead-magnet attributed meeting-booked event with pipeline links', function () {
     $this->travelTo(Carbon::parse('2026-09-10 08:00:00', 'Africa/Algiers'));
@@ -51,8 +52,13 @@ it('records one lead-magnet attributed meeting-booked event with pipeline links'
         'lead_magnet_submission_id' => $submission->id,
     ];
 
-    $this->post('/book/'.$schedule->slug, $payload)->assertRedirect();
-    $this->post('/book/'.$schedule->slug, [...$payload, 'email' => 'other@clinic.dz'])
+    $bookingUrl = URL::signedRoute('meetings.public.show', [
+        'slug' => $schedule->slug,
+        'lead_magnet_submission_id' => $submission->id,
+    ]);
+
+    $this->post($bookingUrl, $payload)->assertRedirect();
+    $this->post($bookingUrl, [...$payload, 'email' => 'other@clinic.dz'])
         ->assertSessionHasErrors('starts_at');
 
     $activity = Activity::query()->where('type', 'meeting')->sole();

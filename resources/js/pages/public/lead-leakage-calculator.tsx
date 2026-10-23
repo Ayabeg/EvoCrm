@@ -81,6 +81,7 @@ export default function LeadLeakageCalculator({
         enrichment_queued: boolean;
         delivery_status: string;
         delivery_error: string | null;
+        booking_url: string | null;
     } | null;
 }) {
     const form = useForm<Inputs>(initialInputs);
@@ -241,7 +242,7 @@ export default function LeadLeakageCalculator({
                         ) : null}
                         {offer.demo_url ? (
                             <a
-                                href={submission ? offer.demo_url + '?submission=' + submission.id : offer.demo_url}
+                                href={submission?.booking_url ?? offer.demo_url}
                                 className="mt-6 inline-flex rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white"
                             >
                                 Request a personalized EvoCrm demo

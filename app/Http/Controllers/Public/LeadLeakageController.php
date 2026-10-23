@@ -22,6 +22,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -57,8 +58,10 @@ class LeadLeakageController extends Controller
             ->where('enabled', true)
             ->orderBy('id')
             ->firstOrFail();
+        $offer = $this->offer($workspace);
         $submission = LeadMagnetSubmission::query()
             ->where('workspace_id', $workspace->id)
+            ->where('lead_magnet_offer_id', $offer->id)
             ->find($request->integer('submission'));
 
         $funnelEvents->record($workspace, FunnelEvent::TYPE_DEMO_REQUESTED, [
@@ -70,10 +73,7 @@ class LeadLeakageController extends Controller
             'meta' => ['offer' => 'lead-leakage-calculator'],
         ]);
 
-        return redirect()->route('meetings.public.show', [
-            'slug' => $schedule->slug,
-            'lead_magnet_submission_id' => $submission?->id,
-        ]);
+        return redirect()->to($this->signedBookingUrl($schedule, $submission?->id));
     }
 
     public function track(
@@ -266,6 +266,7 @@ class LeadLeakageController extends Controller
                 'delivery_status' => $submission->delivery_status,
                 'delivery_error' => $submission->delivery_error,
                 'enrichment_queued' => $submission->enrichment_consent && $submission->contact_id !== null,
+                'booking_url' => $this->signedBookingUrlForSubmission($workspace, $submission),
             ],
         ]);
     }
@@ -302,6 +303,28 @@ class LeadLeakageController extends Controller
             ->where('slug', 'lead-leakage-calculator')
             ->where('status', LeadMagnetOffer::STATUS_ACTIVE)
             ->firstOrFail();
+    }
+
+    private function signedBookingUrlForSubmission(Workspace $workspace, LeadMagnetSubmission $submission): ?string
+    {
+        $schedule = MeetingSchedule::query()
+            ->where('workspace_id', $workspace->id)
+            ->where('enabled', true)
+            ->orderBy('id')
+            ->first();
+
+        return $schedule ? $this->signedBookingUrl($schedule, $submission->id) : null;
+    }
+
+    private function signedBookingUrl(MeetingSchedule $schedule, ?int $submissionId): string
+    {
+        $parameters = ['slug' => $schedule->slug];
+
+        if ($submissionId !== null) {
+            $parameters['lead_magnet_submission_id'] = $submissionId;
+        }
+
+        return URL::signedRoute('meetings.public.show', $parameters);
     }
 
     private function boundedQueryValue(mixed $value): ?string

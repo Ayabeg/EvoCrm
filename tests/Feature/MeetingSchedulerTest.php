@@ -15,6 +15,7 @@ use App\Services\Connectors\FakeGoogleApiClient;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 
 beforeEach(function () {
@@ -186,7 +187,10 @@ it('records a lead-magnet meeting booking in the conversion funnel', function ()
         'delivery_status' => 'inline',
     ]);
 
-    $this->post('/book/'.$schedule->slug, bookPayload([
+    $this->post(URL::signedRoute('meetings.public.show', [
+        'slug' => $schedule->slug,
+        'lead_magnet_submission_id' => $submission->id,
+    ]), bookPayload([
         'lead_magnet_submission_id' => $submission->id,
     ]))->assertRedirect();
 

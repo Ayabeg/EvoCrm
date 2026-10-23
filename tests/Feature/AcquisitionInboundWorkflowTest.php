@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 
 it('carries a lead-magnet visitor through CRM creation, booking, and funnel analytics', function () {
@@ -46,15 +47,15 @@ it('carries a lead-magnet visitor through CRM creation, booking, and funnel anal
 
     Queue::assertPushed(DeliverLeadMagnetSubmission::class);
 
-    $this->get(route('lead-magnet.demo', [
+    $this->get(URL::signedRoute('lead-magnet.demo', [
         'workspace' => $user->workspace->slug,
         'submission' => $submission->id,
-    ]))->assertRedirect(route('meetings.public.show', [
+    ]))->assertRedirect();
+
+    $this->post(URL::signedRoute('meetings.public.show', [
         'slug' => $schedule->slug,
         'lead_magnet_submission_id' => $submission->id,
-    ]));
-
-    $this->post('/book/'.$schedule->slug, [
+    ]), [
         'starts_at' => '2026-09-10T09:00:00+01:00',
         'first_name' => 'Karim',
         'last_name' => 'Hadj',

@@ -19,9 +19,7 @@ class MeetingBookController extends Controller
     public function show(Request $request, string $slug, MeetingSlotFinder $slots): Response
     {
         $schedule = $this->resolve($slug);
-        $submission = LeadMagnetSubmission::query()
-            ->where('workspace_id', $schedule->workspace_id)
-            ->find($request->integer('lead_magnet_submission_id'));
+        $submission = $this->signedSubmission($request, $schedule);
 
         $days = collect($slots->slots($schedule))
             ->groupBy('date')
@@ -47,6 +45,7 @@ class MeetingBookController extends Controller
             ],
             'days' => $days,
             'lead_magnet_submission_id' => $submission?->id,
+            'lead_magnet_booking_url' => $submission && $request->hasValidSignature() ? $request->fullUrl() : null,
             'deal_id' => $request->integer('deal') ?: null,
         ]);
     }
@@ -72,9 +71,7 @@ class MeetingBookController extends Controller
             return back()->withErrors(['phone' => __('Enter an Algerian mobile (+213).')]);
         }
 
-        $submission = LeadMagnetSubmission::query()
-            ->where('workspace_id', $schedule->workspace_id)
-            ->find($data['lead_magnet_submission_id'] ?? null);
+        $submission = $this->signedSubmission($request, $schedule);
 
         $activity = $booker->book($schedule, $data['starts_at'], [
             'first_name' => $data['first_name'],
@@ -113,5 +110,16 @@ class MeetingBookController extends Controller
             ->firstOrFail();
 
         return $schedule;
+    }
+
+    private function signedSubmission(Request $request, MeetingSchedule $schedule): ?LeadMagnetSubmission
+    {
+        if (! $request->hasValidSignature()) {
+            return null;
+        }
+
+        return LeadMagnetSubmission::query()
+            ->where('workspace_id', $schedule->workspace_id)
+            ->find($request->integer('lead_magnet_submission_id'));
     }
 }

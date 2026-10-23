@@ -11,6 +11,7 @@ use App\Models\MeetingSchedule;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 
 it('renders the workspace lead leakage calculator publicly', function () {
@@ -66,21 +67,20 @@ it('offers the configured booking flow and records a deduplicated demo request',
 
     $response->assertInertia(fn ($page) => $page->where('offer.demo_url', $schedule->publicUrl()));
 
-    $this->get(route('lead-magnet.demo', [
+    $demoUrl = URL::signedRoute('lead-magnet.demo', [
         'workspace' => $user->workspace->slug,
         'submission' => $submission->id,
-    ]))->assertRedirect(route('meetings.public.show', [
-        'slug' => $schedule->slug,
-        'lead_magnet_submission_id' => $submission->id,
-    ]));
+    ]);
 
-    $this->get(route('lead-magnet.demo', [
-        'workspace' => $user->workspace->slug,
-        'submission' => $submission->id,
-    ]))->assertRedirect(route('meetings.public.show', [
-        'slug' => $schedule->slug,
-        'lead_magnet_submission_id' => $submission->id,
-    ]));
+    $this->get($demoUrl)->assertRedirect();
+
+    $this->get($demoUrl)->assertRedirect();
+
+    $this->get('/book/'.$schedule->slug.'?lead_magnet_submission_id='.$submission->id)
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('lead_magnet_submission_id', null)
+            ->where('lead_magnet_booking_url', null));
 
     expect(FunnelEvent::query()
         ->where('event_type', FunnelEvent::TYPE_DEMO_REQUESTED)
