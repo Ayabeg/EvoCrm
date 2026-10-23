@@ -1,13 +1,17 @@
 <?php
 
 use App\Enums\WorkspaceRole;
+use App\Jobs\ProcessImportBatch;
 use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\ImportBatch;
 use App\Models\User;
+use App\Services\Crm\ContactCsvImporter;
+use App\Services\Crm\DealCsvImporter;
 use App\Services\Identity\WorkspaceProvisioner;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Bus;
 
 function dealImportCsv(string $contents): UploadedFile
 {
@@ -82,6 +86,44 @@ it('imports deals with contact, company, stage, amount, and close date', functio
         ->and($deal->contact?->email)->toBe('amine@example.test')
         ->and($deal->company?->name)->toBe('Evotechly')
         ->and($batch->fresh()->created_count)->toBe(1);
+});
+
+it('continues large deal imports through bounded queue chunks', function () {
+    Bus::fake();
+    $owner = User::factory()->create(['role' => WorkspaceRole::Owner]);
+    seedDealImportWorkspace($owner);
+    $contact = Contact::factory()->create([
+        'workspace_id' => $owner->workspace_id,
+        'email' => 'import-contact@example.test',
+    ]);
+    $rows = collect(range(1, 101))
+        ->map(fn (int $number): string => "Deal {$number},100,new,{$contact->email}")
+        ->prepend('Deal Name,Amount,Deal Stage,Associated Contact Email')
+        ->implode("\n");
+
+    $batch = app(DealCsvImporter::class)->createBatch(
+        $owner->workspace,
+        $owner,
+        dealImportCsv($rows),
+    );
+
+    $job = new ProcessImportBatch($batch->id);
+    $job->handle(app(ContactCsvImporter::class), app(DealCsvImporter::class));
+
+    expect($batch->fresh()->status)->toBe(ImportBatch::STATUS_PROCESSING)
+        ->and($batch->fresh()->processed_rows)->toBe(100)
+        ->and($batch->fresh()->rows()->where('status', 'pending')->count())->toBe(1);
+
+    Bus::assertDispatched(ProcessImportBatch::class, fn (ProcessImportBatch $continuation): bool => $continuation->batchId === $batch->id);
+
+    $job->handle(app(ContactCsvImporter::class), app(DealCsvImporter::class));
+    expect($batch->fresh()->status)->toBe(ImportBatch::STATUS_COMPLETED)
+        ->and($batch->fresh()->processed_rows)->toBe(101)
+        ->and($batch->fresh()->rows()->where('status', 'pending')->count())->toBe(0)
+        ->and(Deal::query()->where('workspace_id', $owner->workspace_id)->count())->toBe(101);
+
+    $job->handle(app(ContactCsvImporter::class), app(DealCsvImporter::class));
+    expect($batch->fresh()->status)->toBe(ImportBatch::STATUS_COMPLETED);
 });
 
 it('reimports the same deal source without creating duplicates', function () {
