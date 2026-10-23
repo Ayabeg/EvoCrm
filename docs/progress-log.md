@@ -257,6 +257,7 @@ Run the final release audit after the remaining UI/source-contract checks are re
 - Replaced unsigned sequential lead-magnet submission attribution with signed booking capabilities. The calculator returns a signed meeting URL, the booking form preserves it through POST, and unsigned IDs are ignored.
 - Restricted the legacy lead-magnet demo redirect to signed requests and the active calculator offer in the same workspace.
 - The public calculator, meeting, and inbound workflow regression passes **20 tests / 195 assertions**; Pint, targeted ESLint, TypeScript, and `git diff --check` pass.
+- The production Vite build passes after the signed booking handoff; only the repository's existing optional-font, chunk-size, and ineffective dynamic-import warnings remain.
 
 ### Remaining
 
@@ -326,7 +327,7 @@ Run the final release audit after the remaining UI/source-contract checks are re
 
 ### Completed / verified
 
-- Re-ran the complete PHP suite after the partial-provider, address-bound verification, and workspace-isolated campaign-cap increments: **1,354 tests, 1,345 passed, 8 existing branding/design-system/automation contract failures, 35,803 assertions, and 1 skipped**.
+- Re-ran the complete PHP suite after the partial-provider, address-bound verification, workspace-isolated campaign-cap, and signed booking increments: **1,354 tests, 1,345 passed, 8 existing branding/design-system/automation contract failures, 35,811 assertions, and 1 skipped**.
 - No acquisition-system test failed. The two existing `InvalidArgumentException` import warnings remain unchanged.
 
 ### Remaining

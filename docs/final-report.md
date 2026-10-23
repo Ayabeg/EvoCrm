@@ -30,7 +30,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Previous complete focused acquisition regression: **207 tests / 1,440 assertions passed**.
 - Latest post-hardening acquisition integration subset: **181 tests / 1,254 assertions passed**, including lead-magnet engagement tracking, reply safety, imports, enrichment, provider events, and outbound execution.
 - Consent and outbound lifecycle regression: **39 tests / 216 assertions passed**.
-- Latest repository-wide regression after the enrichment and multi-workspace cap hardening: **1,354 tests; 1,345 passed; 8 existing branding/design-system/automation contract failures; 35,803 assertions; 1 skipped**. The 8 failures are outside the acquisition-system implementation; no acquisition test failed.
+- Latest repository-wide regression after the signed lead-magnet booking hardening: **1,354 tests; 1,345 passed; 8 existing branding/design-system/automation contract failures; 35,811 assertions; 1 skipped**. The 8 failures are outside the acquisition-system implementation; no acquisition test failed.
 - Frontend Vitest suite: **27 test files / 97 tests passed**.
 - `npm run types:check` passed.
 - Local browser smoke test passed for the public Lead Leakage Calculator at desktop and 390px mobile widths: the optional contact fields render as text/email controls, the page has no horizontal overflow, an isolated submission rendered the result and linked the shared CRM record, and Reset inputs restored defaults and hid the prior result.
@@ -49,6 +49,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Workspace-timezone campaign-cap regression: **24 tests / 164 assertions passed** for the outbound department; the broader outbound gate passed **72 tests / 411 assertions** with Pint and `git diff --check`.
 - Multi-workspace cap-isolation regression: **25 tests / 171 assertions passed** for the outbound department; the focused campaign/outbound slice passed **57 tests / 357 assertions** with Pint and `git diff --check`.
 - Signed lead-magnet booking regression: **20 tests / 195 assertions passed** across public calculator, meeting, and inbound workflow paths; Pint, targeted ESLint, TypeScript, and `git diff --check` passed.
+- The production Vite build passes after the signed booking handoff; only the repository's existing optional-font, chunk-size, and ineffective dynamic-import warnings remain.
 - Partial-provider enrichment regression: **14 tests / 113 assertions passed** for enrichment, including a transient website failure with a retained Google Places result; the broader acquisition slice passed **39 tests / 284 assertions** and Pint passed.
 - Address-bound verification regression: **19 tests / 127 assertions passed** across enrichment and outbound policy, covering stale-address mismatch and preservation of stronger evidence; Pint and `git diff --check` passed.
 - Security review `adf68552-9b4c-4de9-a9df-5c42735668c6` for the conservative verification-policy change from `3d578579` through `d1738420`: complete coverage of the changed eligibility configuration and zero reportable findings.
