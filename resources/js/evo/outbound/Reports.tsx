@@ -11,6 +11,15 @@ const ReportsChart = lazy(() => import('@/evo/outbound/ReportsChart'));
 
 export type OutboundReportsProps = {
     totals: Record<string, number>;
+    tracking?: Record<string, {
+        count: number;
+        denominator: number | null;
+        rate: number | null;
+        quality: 'actual' | 'inferred' | 'snapshot';
+        source: string;
+        definition: string;
+        caveat?: string | null;
+    }>;
     perSequence: Array<{
         id: number | string;
         name: string;
@@ -42,6 +51,7 @@ export type OutboundReportsProps = {
 
 export function OutboundReports({
     totals,
+    tracking = {},
     perSequence,
     perCampaign,
     daily,
@@ -176,6 +186,41 @@ export function OutboundReports({
                         </div>
                     ))}
             </div>
+            {Object.keys(tracking).length > 0 ? (
+                <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-4">
+                    {Object.entries(tracking).map(([key, metric]) => (
+                        <div
+                            key={key}
+                            className="rounded-[var(--evo-radius-standard)] border border-[var(--evo-hairline)] bg-[var(--evo-surface)] p-3"
+                        >
+                            <div className="flex items-start justify-between gap-2">
+                                <p className="text-[11px] text-[var(--evo-ink-muted)] uppercase">
+                                    {t(key)}
+                                </p>
+                                <span className="text-[10px] text-[var(--evo-ink-muted)]">
+                                    {metric.quality}
+                                </span>
+                            </div>
+                            <p className="text-[18px] font-semibold text-[var(--evo-ink)] tabular-nums">
+                                {formatNumber(metric.count)}
+                            </p>
+                            <p className="text-[11px] text-[var(--evo-ink-muted)]">
+                                {metric.denominator === null
+                                    ? t('No rate denominator')
+                                    : `${metric.rate ?? 0}% ${t('of')} ${formatNumber(metric.denominator)}`}
+                            </p>
+                            <p className="mt-1 text-[11px] leading-4 text-[var(--evo-ink-muted)]">
+                                {metric.definition}
+                            </p>
+                            {metric.caveat ? (
+                                <p className="mt-1 text-[11px] leading-4 text-[var(--evo-ink-muted)]">
+                                    {metric.caveat}
+                                </p>
+                            ) : null}
+                        </div>
+                    ))}
+                </div>
+            ) : null}
             {daily.length > 0 ? (
                 <div className="h-56 rounded-[var(--evo-radius-standard)] border border-[var(--evo-hairline)] bg-[var(--evo-surface)] p-3">
                     <Suspense fallback={<SkeletonRow />}>

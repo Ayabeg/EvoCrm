@@ -64,7 +64,46 @@ it('renders the outbound overview, outbox, replies, and reports pages', function
             ->where('outboundDetail.totals.opened', 1)
             ->has('outboundDetail.tracking.opened')
             ->has('outboundDetail.tracking.bounced')
+            ->where('outboundDetail.tracking.sent.count', 1)
+            ->where('outboundDetail.tracking.sent.denominator', 1)
+            ->where('outboundDetail.tracking.sent.quality', 'inferred')
+            ->where('outboundDetail.tracking.delivered.quality', 'actual')
+            ->where('outboundDetail.tracking.opened.caveat', 'Opens are not reliable proof of interest.')
         );
+});
+
+it('reports explicit outbound denominators and CRM outcomes', function () {
+    $user = User::factory()->create();
+    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+    $campaign = OutboundCampaign::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'audience_count' => 2,
+    ]);
+    $mailbox = Mailbox::factory()->create(['workspace_id' => $user->workspace_id, 'enabled' => false]);
+
+    OutboundMessage::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'contact_id' => $contact->id,
+        'mailbox_id' => $mailbox->id,
+        'campaign_id' => $campaign->id,
+        'channel' => 'email',
+        'direction' => 'out',
+        'to_address' => $contact->email,
+        'subject' => 'Hello',
+        'body' => 'Body',
+        'status' => 'sent',
+        'sent_at' => now(),
+        'delivered_at' => now(),
+        'replied_at' => now(),
+    ]);
+
+    $this->actingAs($user)->get('/reports/outbound')->assertInertia(fn ($page) => $page
+        ->where('outboundDetail.tracking.selected.count', 2)
+        ->where('outboundDetail.tracking.sent.denominator', 1)
+        ->where('outboundDetail.tracking.delivered.rate', 100)
+        ->where('outboundDetail.tracking.qualified_opportunities.denominator', null)
+        ->where('outboundDetail.tracking.customers_won.source', 'crm_pipeline')
+    );
 });
 
 it('attributes outbound campaign reporting to won contact revenue', function () {

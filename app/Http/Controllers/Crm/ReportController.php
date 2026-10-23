@@ -16,6 +16,7 @@ use App\Models\OutboundMessage;
 use App\Models\SavedReport;
 use App\Models\ScheduledReport;
 use App\Models\Sequence;
+use App\Models\Suppression;
 use App\Models\Thread;
 use App\Models\User;
 use App\Models\Workspace;
@@ -710,6 +711,65 @@ class ReportController extends Controller
     {
         $out = OutboundMessage::query()->forWorkspace($workspace)->where('direction', 'out');
         $totals = ['queued' => (clone $out)->where('status', 'queued')->count(), 'sent' => (clone $out)->where('status', 'sent')->count(), 'failed' => (clone $out)->where('status', 'failed')->count(), 'opened' => (clone $out)->whereNotNull('opened_at')->count(), 'clicked' => (clone $out)->whereNotNull('clicked_at')->count(), 'replied' => (clone $out)->whereNotNull('replied_at')->count(), 'delivered' => (clone $out)->whereNotNull('delivered_at')->count(), 'complained' => (clone $out)->whereNotNull('complained_at')->count(), 'bounced' => (clone $out)->where(fn ($query) => $query->where('status', 'bounced')->orWhereNotNull('bounced_at'))->count()];
+        $selected = (int) OutboundCampaign::query()->forWorkspace($workspace)->sum('audience_count');
+        $attempted = (clone $out)->where('status', '!=', 'queued')->count();
+        $positiveReplies = OutboundMessage::query()
+            ->forWorkspace($workspace)
+            ->where('direction', 'in')
+            ->where('reply_classification', 'interested')
+            ->whereNotNull('in_reply_to')
+            ->whereHas('parent', fn (Builder $parent) => $parent->where('direction', 'out'))
+            ->count();
+        $campaignContactIds = (clone $out)->whereNotNull('campaign_id')->pluck('contact_id')->filter()->unique()->values();
+        $openOpportunities = $campaignContactIds->isEmpty()
+            ? 0
+            : Deal::query()
+                ->forWorkspace($workspace)
+                ->whereIn('contact_id', $campaignContactIds)
+                ->whereHas('stage', fn (Builder $stage) => $stage->where('is_won', false)->where('is_lost', false))
+                ->count();
+        $wonCustomers = $campaignContactIds->isEmpty()
+            ? 0
+            : Deal::query()
+                ->forWorkspace($workspace)
+                ->whereIn('contact_id', $campaignContactIds)
+                ->whereHas('stage', fn (Builder $stage) => $stage->where('is_won', true))
+                ->select('contact_id')
+                ->distinct()
+                ->count();
+        $recipientAddresses = (clone $out)->pluck('to_address')->filter()->unique()->values();
+        $optedOut = $recipientAddresses->isEmpty()
+            ? 0
+            : Suppression::query()
+                ->forWorkspace($workspace)
+                ->where('type', 'email')
+                ->whereIn('value', $recipientAddresses)
+                ->count();
+        $metric = static fn (int $count, ?int $denominator, string $quality, string $source, string $definition, ?string $caveat = null): array => [
+            'count' => $count,
+            'denominator' => $denominator,
+            'rate' => $denominator !== null && $denominator > 0 ? round($count / $denominator * 100, 2) : null,
+            'quality' => $quality,
+            'source' => $source,
+            'definition' => $definition,
+            'caveat' => $caveat,
+        ];
+        $tracking = [
+            'selected' => $metric($selected, null, 'snapshot', 'campaign_audience', 'Sum of campaign audience snapshots; the same contact can be selected in more than one campaign.'),
+            'attempted' => $metric($attempted, null, 'inferred', 'outbound_message_state', 'Outbound messages that left the queued state, including local eligibility or provider failures.'),
+            'sent' => $metric($totals['sent'], $attempted, 'inferred', 'mailer_result', 'Messages whose configured mailer returned without an error; this is provider acceptance, not confirmed delivery.'),
+            'delivered' => $metric($totals['delivered'], $totals['sent'], 'actual', 'provider_event', 'Messages with a recorded provider delivery event.'),
+            'bounced' => $metric($totals['bounced'], $totals['sent'], 'actual', 'provider_event', 'Messages with a recorded bounce state or provider bounce event.'),
+            'complained' => $metric($totals['complained'], $totals['sent'], 'actual', 'provider_event', 'Messages with a recorded provider complaint event.'),
+            'replied' => $metric($totals['replied'], $totals['sent'], 'actual', 'reply_sync', 'Accepted outbound messages linked to an inbound reply.'),
+            'positive_replies' => $metric($positiveReplies, $totals['replied'], 'inferred', 'reply_classification', 'Inbound replies classified as interested and linked to an outbound message.', 'Classification is operational triage and should be reviewed before treating it as a qualified opportunity.'),
+            'opened' => $metric($totals['opened'], $totals['sent'], 'actual', 'first_party_tracking', 'Accepted outbound messages with at least one tracking-pixel event.', 'Opens are not reliable proof of interest.'),
+            'clicked' => $metric($totals['clicked'], $totals['sent'], 'actual', 'first_party_tracking', 'Accepted outbound messages with at least one tracked-link event.', 'Clicks indicate a tracked interaction, not qualification.'),
+            'qualified_opportunities' => $metric($openOpportunities, null, 'inferred', 'crm_pipeline', 'Open CRM deals for contacts reached by a campaign.', 'This is contact-attributed CRM state, not proof that the campaign created the opportunity; no conversion rate is shown.'),
+            'customers_won' => $metric($wonCustomers, null, 'inferred', 'crm_pipeline', 'Distinct contacts reached by a campaign with at least one won deal.', 'Campaign attribution is contact-based; no conversion rate is shown.'),
+            'opted_out' => $metric($optedOut, $totals['sent'], 'actual', 'suppression_list', 'Unique recipient addresses currently present in the workspace email suppression list.'),
+            'campaign_errors' => $metric($totals['failed'], $attempted, 'actual', 'outbound_message_state', 'Outbound messages in a failed state after leaving the queue.'),
+        ];
         $perSequence = Sequence::query()->forWorkspace($workspace)->withCount('enrollments')->get()->map(fn (Sequence $s) => ['id' => $s->id, 'name' => $s->name, 'enrollments' => $s->enrollments_count, 'sent' => OutboundMessage::query()->forWorkspace($workspace)->where('direction', 'out')->where('sequence_id', $s->id)->where('status', 'sent')->count(), 'opened' => OutboundMessage::query()->forWorkspace($workspace)->where('direction', 'out')->where('sequence_id', $s->id)->whereNotNull('opened_at')->count(), 'replied' => OutboundMessage::query()->forWorkspace($workspace)->where('direction', 'out')->where('sequence_id', $s->id)->whereNotNull('replied_at')->count()]);
         $campaignMessages = (clone $out)
             ->whereNotNull('campaign_id')
@@ -741,7 +801,7 @@ class ReportController extends Controller
         });
         $daily = OutboundMessage::query()->forWorkspace($workspace)->where('direction', 'out')->where('status', 'sent')->where('sent_at', '>=', now()->subDays(30))->selectRaw('DATE(sent_at) as day, COUNT(*) as sent')->groupBy('day')->orderBy('day')->get();
 
-        return ['totals' => $totals, 'perSequence' => $perSequence, 'perCampaign' => $perCampaign, 'daily' => $daily, 'tracking' => ['sent' => '', 'opened' => '', 'clicked' => '', 'replied' => '', 'delivered' => '', 'complained' => '', 'bounced' => '']];
+        return ['totals' => $totals, 'perSequence' => $perSequence, 'perCampaign' => $perCampaign, 'daily' => $daily, 'tracking' => $tracking];
     }
 
     /* ------------------------------------------------------------------ */

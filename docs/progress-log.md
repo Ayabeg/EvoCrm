@@ -1,5 +1,19 @@
 # EvoCRM acquisition systems progress log
 
+## 2026-10-23 — evidence-aware outbound reporting
+
+### Completed / verified
+
+- Replaced the outbound report's empty tracking placeholders with typed metrics for campaign selection, attempted messages, mailer acceptance, provider delivery, bounces, complaints, replies, positive replies, opens, clicks, suppression matches, CRM outcomes, and campaign errors.
+- Each rate now carries an explicit denominator. Metrics identify whether their evidence is an actual provider/CRM event, an inferred local state, or a campaign snapshot; contact-attributed CRM outcomes do not expose a misleading conversion rate.
+- Added the report UI metric panel with evidence quality, count, denominator/rate, definition, and caveat text. Opens are explicitly labeled as unreliable proof of interest.
+- The outbound report suite passes **9 tests / 134 assertions**; targeted Pint and `npm run types:check` pass; `git diff --check` passes.
+- The full PHP regression after this increment is **1,364 tests; 1,355 passed; 8 existing branding/design-system/automation contract failures; 35,878 assertions; 1 skipped**. No acquisition-system test failed; the two existing `InvalidArgumentException` import warnings remain unchanged.
+
+### Remaining
+
+- Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
+
 ## 2026-10-23 — modular email verification
 
 ### Completed / verified
