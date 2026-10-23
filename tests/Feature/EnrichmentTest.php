@@ -310,10 +310,22 @@ it('keeps email verification tied to the current address and preserves stronger 
         EnrichmentRun::VERIFICATION_UNKNOWN,
     );
 
+    app(EnrichmentPersister::class)->persistProposal(
+        $user->workspace,
+        EnrichmentRun::TARGET_CONTACT,
+        $contact,
+        'email_provider',
+        'email',
+        'verified@clinic-atlas.dz',
+        0.99,
+        [],
+        EnrichmentRun::VERIFICATION_INVALID,
+    );
+
     expect(data_get($contact->fresh()->meta, 'email_verification.email'))
         ->toBe('verified@clinic-atlas.dz')
         ->and(data_get($contact->fresh()->meta, 'email_verification.status'))
-        ->toBe(EnrichmentRun::VERIFICATION_VERIFIED);
+        ->toBe(EnrichmentRun::VERIFICATION_INVALID);
 });
 
 it('applies and dismisses proposed enrichment runs', function () {

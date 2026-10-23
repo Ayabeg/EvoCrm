@@ -232,18 +232,26 @@ class EnrichmentPersister
         $existingStatus = is_string($existing['status'] ?? null) ? $existing['status'] : null;
 
         if ($existingStatus === EnrichmentRun::VERIFICATION_VERIFIED
-            && $incomingStatus !== EnrichmentRun::VERIFICATION_VERIFIED) {
+            && in_array($incomingStatus, $this->inconclusiveVerificationStatuses(), true)) {
             return true;
         }
 
         return $existingStatus === EnrichmentRun::VERIFICATION_EVIDENCE_SUPPORTED
-            && in_array($incomingStatus, [
-                EnrichmentRun::VERIFICATION_UNKNOWN,
-                EnrichmentRun::VERIFICATION_NOT_FOUND,
-                EnrichmentRun::VERIFICATION_NOT_DETECTED,
-                EnrichmentRun::VERIFICATION_TEMPORARY_FAILURE,
-                EnrichmentRun::VERIFICATION_UNSUPPORTED,
-            ], true);
+            && in_array($incomingStatus, $this->inconclusiveVerificationStatuses(), true);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function inconclusiveVerificationStatuses(): array
+    {
+        return [
+            EnrichmentRun::VERIFICATION_UNKNOWN,
+            EnrichmentRun::VERIFICATION_NOT_FOUND,
+            EnrichmentRun::VERIFICATION_NOT_DETECTED,
+            EnrichmentRun::VERIFICATION_TEMPORARY_FAILURE,
+            EnrichmentRun::VERIFICATION_UNSUPPORTED,
+        ];
     }
 
     public function currentValue(Company|Contact|Lead $target, string $field): ?string
