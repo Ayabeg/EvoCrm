@@ -27,6 +27,18 @@
 
 - Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
 
+## 2026-10-23 — connected workflow release gate
+
+### Completed / verified
+
+- Re-ran the shared acquisition, inbound lead-magnet, enrichment, outbound department, campaign runner, consent-policy, and report gates: **70 tests / 513 assertions passed**.
+- Re-ran funnel tracking, meeting-booking attribution, reply pause, bounce/complaint handling, consent, and lead-scoring coverage: **34 tests / 189 assertions passed**.
+- `npm run types:check` passed, including Wayfinder generation and TypeScript compilation. Existing unrelated working-tree edits remain untouched.
+
+### Remaining
+
+- Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
+
 ## 2026-10-23 — configurable lead-scoring rules
 
 ### Completed / verified
