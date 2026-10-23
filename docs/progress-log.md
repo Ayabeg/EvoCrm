@@ -1,5 +1,16 @@
 # EvoCRM acquisition systems progress log
 
+## 2026-10-23 — capture and webhook diagnostic redaction
+
+### Completed / verified
+
+- Redacted public URL-capture exceptions and Meta lead-webhook worker failures before persisting `LeadCapture.error` or `MetaWebhookEvent.error`, completing the shared redaction boundary for inbound provider diagnostics.
+- The targeted inbound/Meta/enrichment/outbound gate passes **70 tests / 455 assertions**; the connected acquisition/inbound/enrichment/outbound/funnel/scoring gate including Meta, lead captures, and bulk actions passes **170 tests / 1,186 assertions**. Pint, PHP syntax, and `git diff --check` pass.
+
+### Remaining
+
+- Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
+
 ## 2026-10-23 — lead-capture diagnostic redaction
 
 ### Completed / verified
