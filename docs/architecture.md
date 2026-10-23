@@ -53,7 +53,7 @@ An approved HTTP verifier can be selected with `EVOSALES_EMAIL_VERIFICATION_DRIV
 
 Website enrichment honors `robots.txt` by default before every public fetch hop. Policies are cached per origin for one hour, `Allow`/`Disallow` specificity and wildcard/end-anchor rules are applied for `User-agent: *`, and unavailable or disallowed policies fail closed without fetching the page. A robots denial is recorded as a skipped enrichment run rather than a provider error.
 
-Lead scoring keeps commercial qualification separate from data quality: the existing fit/intent/timing score remains the qualification authority, while `DataQualityScorer` computes an explainable completeness score from the shared company/contact/source fields and persists it with each score snapshot.
+Lead scoring keeps commercial qualification separate from data quality: the existing fit/intent/timing score remains the qualification authority, while `DataQualityScorer` computes an explainable completeness score from the shared company/contact/source fields and persists it with each score snapshot. Default rule points live in `config/evosales.php`; each workspace can override them through Qualification settings, with bounded values and fallback to defaults for omitted rules. Score snapshots retain the rule breakdown that was applied.
 
 ### EvoCRM Outbound
 

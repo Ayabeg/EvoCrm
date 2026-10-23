@@ -71,6 +71,32 @@ class Workspace extends Model
         ];
     }
 
+    /**
+     * Workspace overrides for the explainable fit, intent, timing, and data-quality rules.
+     *
+     * @return array<string, array<string, int>>
+     */
+    public function leadScoreRules(): array
+    {
+        $defaults = config('evosales.lead_score.rules', []);
+        $stored = is_array($this->lead_score_settings) && is_array($this->lead_score_settings['rules'] ?? null)
+            ? $this->lead_score_settings['rules']
+            : [];
+
+        $rules = [];
+
+        foreach ($defaults as $pillar => $points) {
+            $rules[$pillar] = [];
+
+            foreach ($points as $key => $default) {
+                $value = $stored[$pillar][$key] ?? $default;
+                $rules[$pillar][$key] = max(0, min(100, (int) $value));
+            }
+        }
+
+        return $rules;
+    }
+
     private function thresholdValue(mixed $value): int
     {
         return max(0, min(100, (int) $value));

@@ -174,6 +174,36 @@ return [
         'hold' => 40,
         'qualify' => 60,
         'convert' => 80,
+        'rules' => [
+            'quality' => [
+                'company' => 20,
+                'email' => 25,
+                'phone' => 15,
+                'location' => 10,
+                'domain' => 15,
+                'industry' => 10,
+                'source' => 5,
+            ],
+            'fit' => [
+                'wilaya' => 12,
+                'phone_dz' => 12,
+                'phone' => 8,
+                'email' => 10,
+                'company' => 6,
+            ],
+            'intent' => [
+                'inbound' => 15,
+                'form' => 12,
+                'activity' => 8,
+            ],
+            'timing' => [
+                'today' => 25,
+                '3d' => 18,
+                '7d' => 12,
+                '30d' => 6,
+                'stale' => 0,
+            ],
+        ],
     ],
 
     /*

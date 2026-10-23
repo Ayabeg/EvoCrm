@@ -359,3 +359,42 @@ it('stores workspace qualify thresholds from settings', function () {
         'convert' => 85,
     ]);
 });
+
+it('stores workspace scoring rules and uses the configured points', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->from('/settings/qualify')
+        ->put('/settings/qualify', [
+            'hold' => 20,
+            'qualify' => 40,
+            'convert' => 80,
+            'rules' => [
+                'fit' => [
+                    'wilaya' => 1,
+                    'phone_dz' => 2,
+                    'email' => 3,
+                    'company' => 4,
+                ],
+                'intent' => [
+                    'inbound' => 1,
+                    'form' => 2,
+                    'activity' => 3,
+                ],
+                'timing' => ['today' => 4],
+                'quality' => ['email' => 1],
+            ],
+        ])
+        ->assertRedirect();
+
+    $workspace = $user->workspace->fresh();
+    $lead = highIntentLead($user);
+    $result = app(LeadScoreFormula::class)->compute($lead);
+
+    expect($workspace->leadScoreRules()['fit']['wilaya'])->toBe(1)
+        ->and($workspace->leadScoreRules()['quality']['email'])->toBe(1)
+        ->and($result['fit'])->toBe(10)
+        ->and($result['intent'])->toBe(6)
+        ->and($result['timing'])->toBe(4)
+        ->and($result['score'])->toBe(20);
+});

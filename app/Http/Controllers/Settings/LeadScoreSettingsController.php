@@ -16,6 +16,7 @@ class LeadScoreSettingsController extends Controller
 
         return Inertia::render('settings/qualify', [
             'thresholds' => $workspace->leadScoreThresholds(),
+            'rules' => $workspace->leadScoreRules(),
             'canManage' => $request->user()->role->canManageSettings(),
         ]);
     }
@@ -24,11 +25,20 @@ class LeadScoreSettingsController extends Controller
     {
         abort_unless($request->user()->role->canManageSettings(), 403);
 
-        $data = $request->validate([
+        $validationRules = [
             'hold' => ['required', 'integer', 'min:0', 'max:100'],
             'qualify' => ['required', 'integer', 'min:0', 'max:100'],
             'convert' => ['required', 'integer', 'min:0', 'max:100'],
-        ]);
+            'rules' => ['sometimes', 'array'],
+        ];
+
+        foreach (config('evosales.lead_score.rules', []) as $pillar => $points) {
+            foreach ($points as $key => $default) {
+                $validationRules["rules.{$pillar}.{$key}"] = ['sometimes', 'integer', 'min:0', 'max:100'];
+            }
+        }
+
+        $data = $request->validate($validationRules);
 
         abort_if(
             $data['hold'] > $data['qualify'] || $data['qualify'] > $data['convert'],
@@ -36,11 +46,23 @@ class LeadScoreSettingsController extends Controller
             'Hold must be at or below qualify, and qualify at or below convert.',
         );
 
-        $request->user()->workspace->forceFill([
+        $workspace = $request->user()->workspace;
+        $scoreRules = $workspace->leadScoreRules();
+
+        foreach ($scoreRules as $pillar => $points) {
+            foreach ($points as $key => $default) {
+                if (array_key_exists($key, $data['rules'][$pillar] ?? [])) {
+                    $scoreRules[$pillar][$key] = (int) $data['rules'][$pillar][$key];
+                }
+            }
+        }
+
+        $workspace->forceFill([
             'lead_score_settings' => [
                 'hold' => (int) $data['hold'],
                 'qualify' => (int) $data['qualify'],
                 'convert' => (int) $data['convert'],
+                'rules' => $scoreRules,
             ],
         ])->save();
 

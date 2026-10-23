@@ -14,7 +14,7 @@ No feature in the requested three-system expansion is marked complete merely bec
 - Email-verification provider selection, syntax/MX evidence boundaries, unsupported fallback, address binding, and freshness caching.
 - Authenticated HTTP verifier status normalization, bounded evidence, secret exclusion, and retryable provider outages.
 - Temporary verifier failures must remain retryable and must not be treated as fresh cached results.
-- Scoring breakdowns and configurable thresholds.
+- Scoring breakdowns, configurable rule points, and configurable thresholds.
 - Eligibility policy decisions, including unknown/catch-all email states and suppression.
 - Template rendering and personalization fallbacks without invented claims.
 

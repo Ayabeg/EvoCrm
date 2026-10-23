@@ -14,6 +14,18 @@
 
 - Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
 
+## 2026-10-23 — configurable lead-scoring rules
+
+### Completed / verified
+
+- Moved fit, intent, timing, and data-quality rule points into the central `evosales.lead_score.rules` defaults and added bounded workspace overrides through the existing Qualification settings.
+- Preserved threshold-only updates by merging omitted rule values with the current workspace/default rules; score snapshots continue to retain the applied explainable breakdown.
+- Added regression coverage proving workspace rule changes alter the computed score without changing the separate threshold/action path. The lead-scoring suite passes **13 tests / 80 assertions**; Pint and `npm run types:check` pass.
+
+### Remaining
+
+- Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
+
 ## 2026-10-23 — modular email verification
 
 ### Completed / verified

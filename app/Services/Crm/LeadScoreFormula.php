@@ -34,11 +34,12 @@ class LeadScoreFormula
      */
     public function compute(Lead $lead): array
     {
-        $lead->loadMissing(['contact.company', 'company']);
+        $lead->loadMissing(['contact.company', 'company', 'workspace']);
+        $scoreRules = $lead->workspace?->leadScoreRules() ?? config('evosales.lead_score.rules', []);
 
-        $fit = $this->fit($lead);
-        $intent = $this->intent($lead);
-        $timing = $this->timing($lead);
+        $fit = $this->fit($lead, $scoreRules['fit']);
+        $intent = $this->intent($lead, $scoreRules['intent']);
+        $timing = $this->timing($lead, $scoreRules['timing']);
         $quality = $this->quality->compute($lead);
 
         $score = max(0, min(100, $fit['points'] + $intent['points'] + $timing['points']));
@@ -59,7 +60,7 @@ class LeadScoreFormula
     /**
      * @return array{points: int, rules: list<array{pillar: string, key: string, label: string, points: int}>}
      */
-    private function fit(Lead $lead): array
+    private function fit(Lead $lead, array $weights): array
     {
         $contact = $lead->contact;
         $rules = [];
@@ -67,22 +68,22 @@ class LeadScoreFormula
         $wilaya = trim((string) ($contact?->wilaya ?? ''));
         $priority = array_map('mb_strtolower', config('evosales.wilayas', []));
         if ($wilaya !== '' && in_array(mb_strtolower($wilaya), $priority, true)) {
-            $rules[] = $this->rule('fit', 'wilaya', $wilaya.' wilaya', 12);
+            $rules[] = $this->rule('fit', 'wilaya', $wilaya.' wilaya', $weights['wilaya']);
         }
 
         $phone = AlgerianPhone::normalize($contact?->phone_e164 ?: $contact?->phone);
         if (is_string($phone) && $phone !== '') {
             $rules[] = str_starts_with($phone, '+213')
-                ? $this->rule('fit', 'phone_dz', '+213 phone', 12)
-                : $this->rule('fit', 'phone', 'phone on file', 8);
+                ? $this->rule('fit', 'phone_dz', '+213 phone', $weights['phone_dz'])
+                : $this->rule('fit', 'phone', 'phone on file', $weights['phone']);
         }
 
         if (filled($contact?->email)) {
-            $rules[] = $this->rule('fit', 'email', 'email on file', 10);
+            $rules[] = $this->rule('fit', 'email', 'email on file', $weights['email']);
         }
 
         if ($lead->company_id || $contact?->company_id || $lead->company || $contact?->company) {
-            $rules[] = $this->rule('fit', 'company', 'company attached', 6);
+            $rules[] = $this->rule('fit', 'company', 'company attached', $weights['company']);
         }
 
         return $this->sum($rules, self::FIT_MAX);
@@ -91,22 +92,22 @@ class LeadScoreFormula
     /**
      * @return array{points: int, rules: list<array{pillar: string, key: string, label: string, points: int}>}
      */
-    private function intent(Lead $lead): array
+    private function intent(Lead $lead, array $weights): array
     {
         $rules = [];
         $source = mb_strtolower((string) ($lead->source ?? ''));
         $inbound = ['meta_lead_form', 'meta_ads', 'website', 'inbound', 'whatsapp_cloud', 'ctwa'];
 
         if (in_array($source, $inbound, true)) {
-            $rules[] = $this->rule('intent', 'inbound', 'inbound '.$source, 15);
+            $rules[] = $this->rule('intent', 'inbound', 'inbound '.$source, $weights['inbound']);
         }
 
         if ($this->hasFormAnswers($lead->payload)) {
-            $rules[] = $this->rule('intent', 'form', 'form answers', 12);
+            $rules[] = $this->rule('intent', 'form', 'form answers', $weights['form']);
         }
 
         if ($lead->contact?->last_activity_at) {
-            $rules[] = $this->rule('intent', 'activity', 'recent activity', 8);
+            $rules[] = $this->rule('intent', 'activity', 'recent activity', $weights['activity']);
         }
 
         return $this->sum($rules, self::INTENT_MAX);
@@ -115,17 +116,17 @@ class LeadScoreFormula
     /**
      * @return array{points: int, rules: list<array{pillar: string, key: string, label: string, points: int}>}
      */
-    private function timing(Lead $lead): array
+    private function timing(Lead $lead, array $weights): array
     {
         $anchor = $lead->contact?->last_activity_at ?? $lead->created_at ?? now();
         $days = (int) Carbon::parse($anchor)->diffInDays(now(), true);
 
         $rule = match (true) {
-            $days <= 0 => $this->rule('timing', 'today', 'created today', 25),
-            $days <= 3 => $this->rule('timing', '3d', 'last 3 days', 18),
-            $days <= 7 => $this->rule('timing', '7d', 'last 7 days', 12),
-            $days <= 30 => $this->rule('timing', '30d', 'last 30 days', 6),
-            default => $this->rule('timing', 'stale', 'older than 30 days', 0),
+            $days <= 0 => $this->rule('timing', 'today', 'created today', $weights['today']),
+            $days <= 3 => $this->rule('timing', '3d', 'last 3 days', $weights['3d']),
+            $days <= 7 => $this->rule('timing', '7d', 'last 7 days', $weights['7d']),
+            $days <= 30 => $this->rule('timing', '30d', 'last 30 days', $weights['30d']),
+            default => $this->rule('timing', 'stale', 'older than 30 days', $weights['stale']),
         };
 
         return $this->sum([$rule], self::TIMING_MAX);

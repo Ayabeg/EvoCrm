@@ -15,17 +15,18 @@ class DataQualityScorer
      */
     public function compute(Lead $lead): array
     {
-        $lead->loadMissing(['contact.company', 'company']);
+        $lead->loadMissing(['contact.company', 'company', 'workspace']);
         $contact = $lead->contact;
         $company = $lead->company ?? $contact?->company;
+        $rules = $lead->workspace?->leadScoreRules() ?? config('evosales.lead_score.rules', []);
         $breakdown = [
-            $this->factor('company', 'Company attached', $company && filled($company->name) ? 20 : 0),
-            $this->factor('email', 'Usable business email', $this->hasUsableEmail($contact?->email) ? 25 : 0),
-            $this->factor('phone', 'Usable telephone number', filled($contact?->phone_e164 ?: $contact?->phone) ? 15 : 0),
-            $this->factor('location', 'Geographic location', filled($contact?->city ?: $contact?->wilaya ?: $company?->city ?: $company?->wilaya) ? 10 : 0),
-            $this->factor('domain', 'Company domain', filled($company?->domain) ? 15 : 0),
-            $this->factor('industry', 'Industry identified', filled($company?->industry) ? 10 : 0),
-            $this->factor('source', 'Traceable lead source', filled($lead->source) ? 5 : 0),
+            $this->factor('company', 'Company attached', $company && filled($company->name) ? $rules['quality']['company'] : 0),
+            $this->factor('email', 'Usable business email', $this->hasUsableEmail($contact?->email) ? $rules['quality']['email'] : 0),
+            $this->factor('phone', 'Usable telephone number', filled($contact?->phone_e164 ?: $contact?->phone) ? $rules['quality']['phone'] : 0),
+            $this->factor('location', 'Geographic location', filled($contact?->city ?: $contact?->wilaya ?: $company?->city ?: $company?->wilaya) ? $rules['quality']['location'] : 0),
+            $this->factor('domain', 'Company domain', filled($company?->domain) ? $rules['quality']['domain'] : 0),
+            $this->factor('industry', 'Industry identified', filled($company?->industry) ? $rules['quality']['industry'] : 0),
+            $this->factor('source', 'Traceable lead source', filled($lead->source) ? $rules['quality']['source'] : 0),
         ];
 
         return [
