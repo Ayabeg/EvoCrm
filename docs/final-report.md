@@ -1,6 +1,6 @@
 # Acquisition systems release report
 
-Current implementation revision: `207b3d7e` (`main`; this release report is maintained in subsequent documentation commits)
+Current implementation revision: `b15b3d6d` (`main`; this release report is maintained in subsequent documentation commits)
 
 This report records the current verified state of Dead Enrichment, EvoCRM Outbound, and Dead Magnet. It is a release-readiness report, not a claim that live providers or the unrelated repository UI contracts are production-ready.
 
@@ -9,6 +9,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Shared workspace-scoped CRM integration across companies, contacts, leads, activities, consent, suppression, enrichment provenance, outbound messages, and funnel events.
 - Dead Enrichment ingestion, incomplete-row retention, normalization, duplicate-safe re-imports, provider evidence, verification-state projection, CRM detection, explainable data-quality scoring, bounded queueing, retries, and retry actions.
 - EvoCRM Outbound eligibility, suppression rechecks, explicit consent policy, template rendering, sanitized HTML, preview, campaign and sequence execution, quiet hours, mailbox caps, durable send claims, provider-event idempotency, reply classification, unsubscribe handling, and interested-reply tasks.
+- Broadcast campaigns can be edited while draft or scheduled, with workspace-scoped audience/template/mailbox relationships; started campaigns remain immutable.
 - Conservative email-verification eligibility: invalid, temporary-failure, unsupported, catch-all, and unknown states are blocked by default, with explicit deployment configuration required to allow uncertain states.
 - Missing email-verification metadata is treated as unknown and blocked by default; only the explicit authenticated mailbox test-send path may bypass prospect verification and consent checks, while still validating the recipient and suppression list.
 - Explicit uncertain-email campaign policy: sequences and broadcast campaigns persist a strict-by-default policy, and permissive policies are honored only when the deployment-level uncertain-address guard also permits them. Evidence-only, not-found, not-detected, and conflicting states remain blocked because they do not prove deliverability.
@@ -37,6 +38,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Shell/locale/Aurora contract regression: **38 tests / 475 assertions passed** after restoring the localized `Search EvoCRM…` rail label; TypeScript, targeted ESLint, and `git diff --check` passed.
 - Explicit email-policy regression: **44 tests / 223 assertions passed** across enrollment, campaign preview/expansion, and outbound execution paths; Pint, TypeScript, targeted ESLint, and `git diff --check` passed.
 - Fail-closed missing-verification regression: **51 tests / 320 assertions passed** across enrollment, campaign execution, ordinary dispatch, and the controlled mailbox test-send path; Pint passed.
+- Broadcast campaign editing regression: **8 tests / 108 assertions passed**; the broader outbound lifecycle set passed **64 tests / 383 assertions**; PHP formatting, TypeScript, targeted ESLint, production Vite build, and `git diff --check` passed.
 - Security review `adf68552-9b4c-4de9-a9df-5c42735668c6` for the conservative verification-policy change from `3d578579` through `d1738420`: complete coverage of the changed eligibility configuration and zero reportable findings.
 - Current acquisition diff-scoped Codex Security review `df528cd2-71b4-4b34-a846-e54a368f0cad` for `286f2634` through `5d125577`: complete coverage of three changed security surfaces and zero reportable findings. The subsequent migration-only review is recorded below.
 - Migration follow-up security review `e1610fcd-062f-4485-b9c4-b4d08ee6ba00` for `5d125577` through `3d578579`: complete coverage of the migration preflight and zero reportable findings.
@@ -58,6 +60,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - `3d578579` — added the non-destructive duplicate preflight before applying the funnel-event uniqueness constraint.
 - `7010768d` — recorded the external repository audit.
 - `207b3d7e` — blocked outbound prospects without a verification record and isolated the authenticated mailbox test-send exception.
+- `b15b3d6d` — added workspace-scoped editing for draft and scheduled outbound campaigns.
 
 ## Implemented but not fully verified
 
