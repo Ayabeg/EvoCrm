@@ -1,6 +1,6 @@
 # Acquisition systems release report
 
-Current implementation revision: `cf0268a1` (`main`; release report is maintained in subsequent documentation commits)
+Current implementation revision: `cd4ac573` (`main`; release report is maintained in subsequent documentation commits)
 
 This report records the current verified state of Dead Enrichment, EvoCRM Outbound, and Dead Magnet. It is a release-readiness report, not a claim that live providers or the unrelated repository UI contracts are production-ready.
 
@@ -99,6 +99,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - `ed59f1b5` — modular email-verification provider contract, disabled fallback, optional DNS evidence, and cache coverage.
 - `93b93be9` — authenticated HTTP email-verification adapter, normalized provider response handling, and temporary-failure retry preservation.
 - `dea586da` — robots-aware public website enrichment with redirect-hop enforcement.
+- `cd4ac573` — validated configurable score-rule pillar shapes and recorded the follow-up security evidence.
 
 ## Implemented but not fully verified
 
