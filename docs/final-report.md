@@ -73,7 +73,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Current full PHP regression: **1,371 tests; 1,362 passed; 8 failures; 35,929 assertions; 1 skipped**. The 115-test acquisition gate remains green; the repository-wide suite is not yet release-green because of the known unrelated contract failures.
 - Latest full PHP regression after resumable import queue pages: **1,373 tests; 1,364 passed; 8 known unrelated branding/design-system/automation failures; 35,937 assertions; 1 skipped**. The two existing `InvalidArgumentException` import warnings remain unchanged; the connected acquisition gate remains green at **132 tests / 970 assertions**.
 - Contact/deal import diagnostics now redact terminal worker errors; the focused import/redaction gate passes **18 tests / 168 assertions**, and the connected acquisition gate including imports passes **131 tests / 966 assertions**.
-- Resumable import queue pages: the focused import/redaction gate passes **19 tests / 172 assertions**, and the connected acquisition/inbound/enrichment/outbound/funnel/scoring gate passes **132 tests / 970 assertions**. Pint, PHP syntax, and `git diff --check` pass.
+- Resumable import queue pages: the focused import/redaction gate passes **20 tests / 181 assertions**, and the connected acquisition/inbound/enrichment/outbound/funnel/scoring gate passes **133 tests / 979 assertions**. Pint, PHP syntax, and `git diff --check` pass, including a 101-row deal-import continuation and stale-worker regression.
 - Production Vite build passed after the outbound reporting and scoring UI changes; existing font fallback, chunk-size, and ineffective dynamic-import warnings remain.
 - Full PHP regression after robots enforcement: **1,363 tests; 1,354 passed; 8 existing branding/design-system/automation contract failures; 35,852 assertions; 1 skipped**. No acquisition test failed.
 - Full PHP regression after evidence-aware outbound reporting: **1,364 tests; 1,355 passed; 8 existing branding/design-system/automation contract failures; 35,878 assertions; 1 skipped**. No acquisition/report test failed; the two existing `InvalidArgumentException` import warnings remain unchanged.
@@ -122,6 +122,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - `aaa61631` — throttled public lead-magnet landing-page visits and added route coverage.
 - `a946078f` — redacted contact/deal import and import-worker diagnostics before persistence.
 - `6a794282` — made contact/deal imports resumable through bounded queue pages with stale-worker idempotency.
+- `b84aab2d` — covered 101-row deal-import continuation and stale completed-worker behavior.
 
 ## Implemented but not fully verified
 
