@@ -5,6 +5,7 @@ use App\Models\SavedReport;
 use App\Models\ScheduledReport;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
+use Symfony\Component\Mailer\Exception\TransportException;
 
 it('creates pauses and deletes a report schedule', function () {
     $user = User::factory()->create();
@@ -87,4 +88,34 @@ it('delivers a rendered report once per window and records failure', function ()
     $this->artisan('reports:deliver')->assertSuccessful();
     expect($broken->fresh()->last_status)->toBe('failed')
         ->and($broken->fresh()->last_error)->toContain('recipients');
+});
+
+it('redacts scheduled report transport failures before persistence', function () {
+    $user = User::factory()->create();
+    $dashboard = Dashboard::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'owner_id' => $user->id,
+        'name' => 'Team board',
+        'visibility' => 'workspace',
+        'widgets' => [['key' => 'pipeline.evoviz.bar']],
+    ]);
+    $schedule = ScheduledReport::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'dashboard_id' => $dashboard->id,
+        'name' => 'Broken transport',
+        'cron' => '0 8 * * *',
+        'recipients' => ['ops@evotechly.com'],
+        'active' => true,
+    ]);
+
+    Mail::shouldReceive('to')->once()->andThrow(new TransportException(
+        'SMTP failed for owner@clinic.dz at https://smtp.example.test using Authorization: Bearer secret-value',
+    ));
+
+    $this->artisan('reports:deliver')->assertSuccessful();
+
+    expect($schedule->fresh()->last_status)->toBe('failed')
+        ->and($schedule->fresh()->last_error)->not->toContain('owner@clinic.dz')
+        ->and($schedule->fresh()->last_error)->not->toContain('https://smtp.example.test')
+        ->and($schedule->fresh()->last_error)->not->toContain('Bearer secret-value');
 });

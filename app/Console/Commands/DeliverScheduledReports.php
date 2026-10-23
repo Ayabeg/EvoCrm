@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Mail\WorkspaceHtmlMail;
 use App\Models\ScheduledReport;
 use App\Services\Crm\ScheduledReportRenderer;
+use App\Services\Crm\WorkflowExecutionRedactor;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 use Throwable;
@@ -62,7 +63,7 @@ class DeliverScheduledReports extends Command
             } catch (Throwable $e) {
                 $schedule->forceFill([
                     'last_status' => 'failed',
-                    'last_error' => $e->getMessage(),
+                    'last_error' => app(WorkflowExecutionRedactor::class)->redactError($e->getMessage()),
                     'last_window' => $window,
                 ])->save();
             }
