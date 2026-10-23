@@ -101,7 +101,7 @@ it('marks the desk message failed when the SMS provider rejects the send', funct
     $fake = app(FakeSmsClient::class);
     $fake->reset();
     $fake->ok = false;
-    $fake->error = 'Unreachable number';
+    $fake->error = 'Unreachable number for owner@clinic.dz using Authorization: Bearer secret-value';
 
     $user = User::factory()->create();
     $thread = smsThread($user);
@@ -113,7 +113,9 @@ it('marks the desk message failed when the SMS provider rejects the send', funct
     $message = Message::query()->where('thread_id', $thread->id)->latest('id')->first();
 
     expect($message->status)->toBe('failed')
-        ->and($message->failure_reason)->toBe('Unreachable number');
+        ->and($message->failure_reason)->toContain('Unreachable number')
+        ->and($message->failure_reason)->not->toContain('owner@clinic.dz')
+        ->and($message->failure_reason)->not->toContain('Bearer secret-value');
 });
 
 it('fails SMS when the number is an Algerian landline', function () {

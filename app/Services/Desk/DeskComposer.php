@@ -8,6 +8,7 @@ use App\Models\Message;
 use App\Models\Thread;
 use App\Models\Ticket;
 use App\Models\User;
+use App\Services\Crm\WorkflowExecutionRedactor;
 use App\Services\Evolution\EvolutionCloudService;
 
 class DeskComposer
@@ -84,7 +85,9 @@ class DeskComposer
         $message->forceFill([
             'status' => $result['ok'] ? 'sent' : 'failed',
             'provider_message_id' => data_get($result, 'body.key.id') ?? data_get($result, 'body.id'),
-            'failure_reason' => $result['ok'] ? null : ($result['error'] ?? 'Send failed'),
+            'failure_reason' => $result['ok']
+                ? null
+                : app(WorkflowExecutionRedactor::class)->redactError($result['error'] ?? 'Send failed'),
             'payload' => $result['body'] ?? null,
         ])->save();
     }
@@ -109,7 +112,9 @@ class DeskComposer
             'status' => $result['ok'] ? 'sent' : 'failed',
             'provider' => $result['stub'] ? 'sms' : ($result['provider'] ?? 'sms'),
             'provider_message_id' => $result['id'] ?? null,
-            'failure_reason' => $result['ok'] ? null : ($result['error'] ?? 'Send failed'),
+            'failure_reason' => $result['ok']
+                ? null
+                : app(WorkflowExecutionRedactor::class)->redactError($result['error'] ?? 'Send failed'),
             'payload' => array_filter([
                 ...((array) ($result['body'] ?? [])),
                 'stub' => $result['stub'] ? true : null,

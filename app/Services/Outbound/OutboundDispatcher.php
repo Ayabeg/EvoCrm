@@ -8,6 +8,7 @@ use App\Models\OutboundMessage;
 use App\Models\Sequence;
 use App\Models\Workspace;
 use App\Services\Analytics\ProductAnalytics;
+use App\Services\Crm\WorkflowExecutionRedactor;
 use App\Services\Desk\AlgerianSms;
 use App\Services\Evolution\EvolutionCloudService;
 
@@ -192,7 +193,9 @@ class OutboundDispatcher
         $message->forceFill([
             'status' => $result['ok'] ? 'sent' : 'failed',
             'sending_at' => null,
-            'failure_reason' => $result['ok'] ? null : ($result['error'] ?? 'Template send failed'),
+            'failure_reason' => $result['ok']
+                ? null
+                : app(WorkflowExecutionRedactor::class)->redactError($result['error'] ?? 'Template send failed'),
             'sent_at' => $result['ok'] ? now() : null,
         ])->save();
 
@@ -208,7 +211,9 @@ class OutboundDispatcher
         $message->forceFill([
             'status' => $result['ok'] ? 'sent' : 'failed',
             'sending_at' => null,
-            'failure_reason' => $result['ok'] ? null : ($result['error'] ?? 'SMS send failed'),
+            'failure_reason' => $result['ok']
+                ? null
+                : app(WorkflowExecutionRedactor::class)->redactError($result['error'] ?? 'SMS send failed'),
             'sent_at' => $result['ok'] ? now() : null,
             'to_address' => $result['e164'] ?: $message->to_address,
             'provider_event_id' => $result['id'],
