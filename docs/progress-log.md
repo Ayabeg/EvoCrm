@@ -8,6 +8,7 @@
 - Completed imports are idempotent against stale duplicate workers, and terminal worker/import diagnostics continue to use the shared redaction contract.
 - The focused import/redaction gate passes **19 tests / 172 assertions**; the connected acquisition/inbound/enrichment/outbound/funnel/scoring gate passes **132 tests / 970 assertions**. Pint, PHP syntax, and `git diff --check` pass.
 - The design was informed by the supplied `Awaisali36/50k-lead-generation-system` reference: staged, bounded processing is adopted while its n8n/Airtable/Apify/Gemini implementation is not copied into EvoCRM.
+- The repository-wide PHP regression completed at **1,373 tests; 1,364 passed; 8 known unrelated branding/design-system/automation failures; 35,937 assertions; 1 skipped**. The two existing `InvalidArgumentException` import warnings remain unchanged.
 
 ### Remaining
 
