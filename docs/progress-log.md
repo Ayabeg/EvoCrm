@@ -250,6 +250,17 @@ Run the final release audit after the remaining UI/source-contract checks are re
 
 - Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
 
+## 2026-10-23 — workspace-timezone campaign cap
+
+### Completed / verified
+
+- Aligned broadcast campaign daily-cap counting and rollover with each workspace's configured timezone. A message deferred near midnight now resumes at the next workspace-local day rather than the application server's date.
+- Added a cross-midnight regression with a non-default workspace timezone. The outbound department set passes **24 tests / 164 assertions**; the broader outbound gate passes **72 tests / 411 assertions**; Pint and `git diff --check` pass.
+
+### Remaining
+
+- Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
+
 ## 2026-10-23 — address-bound verification provenance
 
 ### Completed / verified

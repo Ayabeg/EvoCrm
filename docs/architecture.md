@@ -76,7 +76,7 @@ Completed bookings record a deduplicated meeting_booked funnel event against the
 - Unique keys and idempotency keys prevent duplicate imports, submissions, sends, provider events, and subject-scoped funnel events. Funnel-event recording uses a database unique constraint plus `createOrFirst` so concurrent callbacks cannot pass a check-then-insert gap.
 - Long-running enrichment and outbound actions run through durable jobs/commands, not in-memory timers.
 - Campaign audiences over 1,000 contacts use `ExpandOutboundCampaign` cursor jobs in 250-contact pages; each page persists progress and reuses the workspace/idempotency boundary before the campaign becomes sendable.
-- Broadcast campaigns persist a configurable daily send cap (20 messages by default). Messages beyond that cap remain queued with a durable `campaign_daily_cap` defer reason and become eligible after the next workspace day; the mailbox cap remains an independent lower bound.
+- Broadcast campaigns persist a configurable daily send cap (20 messages by default). Messages beyond that cap remain queued with a durable `campaign_daily_cap` defer reason and become eligible after the next workspace-local day; the mailbox cap remains an independent lower bound.
 - Retries use bounded exponential backoff and preserve the original error and attempt history.
 - Enrichment jobs are unique for one hour per workspace/target type/record, retry up to three times with bounded backoff, and can be queued from a workspace-scoped bulk action.
 - Stronger existing evidence is not silently replaced by weaker or stale evidence.

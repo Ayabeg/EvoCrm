@@ -1,6 +1,6 @@
 # Acquisition systems release report
 
-Current implementation revision: `67b24b2c` (`main`; this release report is maintained in subsequent documentation commits)
+Current implementation revision: `0e3b0660` (`main`; this release report is maintained in subsequent documentation commits)
 
 This report records the current verified state of Dead Enrichment, EvoCRM Outbound, and Dead Magnet. It is a release-readiness report, not a claim that live providers or the unrelated repository UI contracts are production-ready.
 
@@ -12,6 +12,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - EvoCRM Outbound eligibility, suppression rechecks, explicit consent policy, template rendering, sanitized HTML, preview, campaign and sequence execution, quiet hours, mailbox caps, durable send claims, provider-event idempotency, reply classification, unsubscribe handling, and interested-reply tasks.
 - Broadcast campaigns can be edited while draft or scheduled, with workspace-scoped audience/template/mailbox relationships; started campaigns remain immutable.
 - Broadcast campaigns persist a configurable 20/day default cap; excess messages remain queued with a durable defer reason and resume on the next day, while mailbox caps remain independently enforced.
+- Campaign daily-cap counting and rollover use each workspace's configured timezone rather than the application timezone.
 - Conservative email-verification eligibility: invalid, temporary-failure, unsupported, catch-all, and unknown states are blocked by default, with explicit deployment configuration required to allow uncertain states.
 - Email-verification projections are address-bound and fail closed when stale; stronger current-address evidence is not silently replaced by weaker proposals.
 - Missing email-verification metadata is treated as unknown and blocked by default; only the explicit authenticated mailbox test-send path may bypass prospect verification and consent checks, while still validating the recipient and suppression list.
@@ -43,6 +44,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Fail-closed missing-verification regression: **51 tests / 320 assertions passed** across enrollment, campaign execution, ordinary dispatch, and the controlled mailbox test-send path; Pint passed.
 - Broadcast campaign editing regression: **8 tests / 108 assertions passed**; the broader outbound lifecycle set passed **64 tests / 383 assertions**; PHP formatting, TypeScript, targeted ESLint, production Vite build, and `git diff --check` passed.
 - Per-campaign daily-cap regression: **70 tests / 402 assertions passed** across campaign expansion, rollover, editing, and outbound lifecycle; Pint, targeted ESLint, TypeScript, `git diff --check`, and the production Vite build passed. The build retains only the repository's existing optional-font, chunk-size, and dynamic-import warnings.
+- Workspace-timezone campaign-cap regression: **24 tests / 164 assertions passed** for the outbound department; the broader outbound gate passed **72 tests / 411 assertions** with Pint and `git diff --check`.
 - Partial-provider enrichment regression: **14 tests / 113 assertions passed** for enrichment, including a transient website failure with a retained Google Places result; the broader acquisition slice passed **39 tests / 284 assertions** and Pint passed.
 - Address-bound verification regression: **19 tests / 127 assertions passed** across enrichment and outbound policy, covering stale-address mismatch and preservation of stronger evidence; Pint and `git diff --check` passed.
 - Security review `adf68552-9b4c-4de9-a9df-5c42735668c6` for the conservative verification-policy change from `3d578579` through `d1738420`: complete coverage of the changed eligibility configuration and zero reportable findings.
@@ -68,6 +70,10 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - `207b3d7e` — blocked outbound prospects without a verification record and isolated the authenticated mailbox test-send exception.
 - `b15b3d6d` — added workspace-scoped editing for draft and scheduled outbound campaigns.
 - `67b24b2c` — added configurable per-campaign daily caps with durable rollover deferral.
+- `d821eef2` — preserved partial enrichment results when one provider is transiently unavailable.
+- `fe929a47` — bound email-verification projections to the current address and preserved stronger evidence.
+- `5438a835` — kept explicit invalid verification results fail-closed.
+- `0e3b0660` — applied workspace timezones to campaign daily-cap counting and rollover.
 
 ## Implemented but not fully verified
 
