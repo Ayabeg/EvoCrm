@@ -1,6 +1,6 @@
 # Acquisition systems release report
 
-Current implementation revision: `3d578579` (`main`; this release report is maintained in subsequent documentation commits)
+Current implementation revision: `77f1edbc` (`main`; this release report is maintained in subsequent documentation commits)
 
 This report records the current verified state of Dead Enrichment, EvoCRM Outbound, and Dead Magnet. It is a release-readiness report, not a claim that live providers or the unrelated repository UI contracts are production-ready.
 
