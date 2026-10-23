@@ -33,3 +33,20 @@ it('redacts emails tokens and urls from error summaries', function () {
         ->and($error)->not->toContain('Bearer xyz')
         ->and($error)->not->toContain('token=abcd');
 });
+
+it('redacts row-level import diagnostics with the same error contract', function () {
+    $redactor = new WorkflowExecutionRedactor;
+
+    $rowError = mb_substr(
+        $redactor->redactError(
+            'Import row failed for amina@clinic.dz at https://provider.example.test using Authorization: Bearer secret-value',
+        ),
+        0,
+        500,
+    );
+
+    expect($rowError)
+        ->not->toContain('amina@clinic.dz')
+        ->not->toContain('https://provider.example.test')
+        ->not->toContain('Bearer secret-value');
+});

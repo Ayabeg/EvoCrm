@@ -13,6 +13,7 @@ use App\Services\Crm\ContactCsvImporter;
 use App\Services\Crm\DealCsvImporter;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 
 function contactImportCsv(string $contents, string $name = 'contacts.csv'): UploadedFile
@@ -93,6 +94,27 @@ it('continues large contact imports through bounded queue chunks', function () {
         ->and($batch->fresh()->rows()->where('status', 'pending')->count())->toBe(1);
 
     Bus::assertDispatched(ProcessImportBatch::class, fn (ProcessImportBatch $job): bool => $job->batchId === $batch->id);
+});
+
+it('redacts row-level contact import exceptions before persistence', function () {
+    $owner = User::factory()->create(['role' => WorkspaceRole::Owner]);
+    $batch = app(ContactCsvImporter::class)->createBatch(
+        $owner->workspace,
+        $owner,
+        contactImportCsv("Email,First Name\ncontact@example.test,Contact"),
+    );
+
+    DB::shouldReceive('transaction')
+        ->once()
+        ->andThrow(new RuntimeException('Import row failed for owner@clinic.dz at https://provider.example.test using Authorization: Bearer secret-value'));
+
+    app(ContactCsvImporter::class)->process($batch);
+
+    $error = $batch->fresh()->rows()->first()->error_message;
+    expect($error)
+        ->not->toContain('owner@clinic.dz')
+        ->not->toContain('https://provider.example.test')
+        ->not->toContain('Bearer secret-value');
 });
 
 it('lets an owner preview a HubSpot contact export and commit mapped creates', function () {

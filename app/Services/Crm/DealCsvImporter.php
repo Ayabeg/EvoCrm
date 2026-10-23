@@ -432,7 +432,11 @@ class DealCsvImporter
             $row->forceFill([
                 'status' => ImportRow::STATUS_ERROR,
                 'preview_action' => ImportRow::ACTION_ERROR,
-                'error_message' => mb_substr($exception->getMessage(), 0, 500),
+                'error_message' => mb_substr(
+                    app(WorkflowExecutionRedactor::class)->redactError($exception->getMessage()),
+                    0,
+                    500,
+                ),
             ])->save();
             $batch->increment('error_count');
             $batch->increment('processed_rows');

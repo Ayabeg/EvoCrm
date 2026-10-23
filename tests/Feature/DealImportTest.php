@@ -12,6 +12,7 @@ use App\Services\Crm\DealCsvImporter;
 use App\Services\Identity\WorkspaceProvisioner;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\DB;
 
 function dealImportCsv(string $contents): UploadedFile
 {
@@ -124,6 +125,32 @@ it('continues large deal imports through bounded queue chunks', function () {
 
     $job->handle(app(ContactCsvImporter::class), app(DealCsvImporter::class));
     expect($batch->fresh()->status)->toBe(ImportBatch::STATUS_COMPLETED);
+});
+
+it('redacts row-level deal import exceptions before persistence', function () {
+    $owner = User::factory()->create(['role' => WorkspaceRole::Owner]);
+    seedDealImportWorkspace($owner);
+    $contact = Contact::factory()->create([
+        'workspace_id' => $owner->workspace_id,
+        'email' => 'import-contact@example.test',
+    ]);
+    $batch = app(DealCsvImporter::class)->createBatch(
+        $owner->workspace,
+        $owner,
+        dealImportCsv("Deal Name,Amount,Deal Stage,Associated Contact Email\nWebsite rebuild,100,new,{$contact->email}"),
+    );
+
+    DB::shouldReceive('transaction')
+        ->once()
+        ->andThrow(new RuntimeException('Import row failed for owner@clinic.dz at https://provider.example.test using Authorization: Bearer secret-value'));
+
+    app(DealCsvImporter::class)->process($batch);
+
+    $error = $batch->fresh()->rows()->first()->error_message;
+    expect($error)
+        ->not->toContain('owner@clinic.dz')
+        ->not->toContain('https://provider.example.test')
+        ->not->toContain('Bearer secret-value');
 });
 
 it('reimports the same deal source without creating duplicates', function () {
