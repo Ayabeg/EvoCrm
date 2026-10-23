@@ -309,3 +309,14 @@ Run the final release audit after the remaining UI/source-contract checks are re
 ### Remaining
 
 - Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
+
+## 2026-10-23 — current repository-wide regression baseline
+
+### Completed / verified
+
+- Re-ran the complete PHP suite after the partial-provider, address-bound verification, and workspace-isolated campaign-cap increments: **1,354 tests, 1,345 passed, 8 existing branding/design-system/automation contract failures, 35,803 assertions, and 1 skipped**.
+- No acquisition-system test failed. The two existing `InvalidArgumentException` import warnings remain unchanged.
+
+### Remaining
+
+- Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
